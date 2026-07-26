@@ -46,8 +46,8 @@
     font-family:var(--serif-en);font-size:13px;letter-spacing:.22em;color:var(--moss);text-transform:uppercase;font-weight:600;
   }
   header.top h1{
-    font-family:var(--serif);
-    font-size:23px;margin:8px 0 0;font-weight:700;letter-spacing:.02em;
+    font-family:var(--serif-en);
+    font-size:28px;margin:8px 0 0;font-weight:600;letter-spacing:.03em;
   }
 
   /* Screens */
@@ -132,7 +132,6 @@
   .branch-tab[data-branch="regressions"].active{background:#BA7517;color:#FAEEDA;}
   .branch-tab[data-branch="errors"]{background:#FCEBEB;color:#A32D2D;}
   .branch-tab[data-branch="errors"].active{background:#A32D2D;color:#FCEBEB;}
-  .gen-exname{color:var(--moss);font-weight:700;font-size:16px;}
   .branch-panel{display:none;margin-top:14px;}
   .branch-panel.active{display:block;}
   .chip-list{display:flex;flex-direction:column;gap:10px;}
@@ -156,10 +155,21 @@
     padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);
   }
   .gen-btn:disabled{background:#b7bfae;}
-  .gen-result{margin-top:20px;}
-  .gen-note{
-    background:var(--paper-dim);border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.7;
-    color:#4a463c;margin-bottom:14px;white-space:pre-wrap;
+  .gen-result{margin-top:24px;}
+  .gen-para{font-size:14px;line-height:1.8;color:#4a463c;margin:0 0 20px;}
+  .gen-item{
+    display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;
+    padding:18px 18px;margin-bottom:14px;
+  }
+  .gen-item-num{
+    flex-shrink:0;font-family:var(--serif-en);font-size:19px;color:var(--gold);font-weight:600;
+    line-height:1.6;min-width:22px;
+  }
+  .gen-item-body{font-size:14px;line-height:1.8;color:#4a463c;}
+  .gen-exname{color:var(--moss);font-weight:700;font-size:16px;display:inline-block;margin-bottom:2px;}
+  .gen-summary{
+    margin-top:22px;padding-top:18px;border-top:2px solid var(--gold);
+    font-size:13.5px;line-height:1.85;color:#4a463c;
   }
   .loading{font-size:13px;color:var(--moss);margin-top:14px;}
   .error-box{
@@ -185,7 +195,7 @@
 
   <header class="top">
     <div class="eyebrow">Movement Science</div>
-    <h1 id="headerTitle">エクササイズライブラリー</h1>
+    <h1 id="headerTitle">Exercise Library</h1>
   </header>
 
   <!-- 一覧画面 -->
@@ -531,7 +541,7 @@ function switchTab(name, fromCardClick){
   document.getElementById(`screen-${name}`).classList.add("active");
   document.getElementById(`tab-${name}`).classList.add("active");
 
-  const titles = { list: "エクササイズライブラリー", detail: "エクササイズライブラリー", generator: "プログラムジェネレーター" };
+  const titles = { list: "Exercise Library", detail: "Exercise Library", generator: "Program Generator" };
   document.getElementById("headerTitle").textContent = titles[name];
 }
 
@@ -594,16 +604,25 @@ ${candidateList}
     // Workerのレスポンス形式は既存プロキシに合わせて調整してください（例：{ text: "..." } を想定）
     const text = data.text || data.result || data.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
     const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
+
+    const boldify = s => s.replace(/\*\*(.+?)\*\*/g, '<span class="gen-exname">$1</span>');
+    const paragraphs = escapeHtml(text).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+
     let bulletIndex = 0;
-    let highlighted = escapeHtml(text)
-      .replace(/(^|\n)・/g, (m, p1) => {
+    let sawItem = false;
+    const html = paragraphs.map(p => {
+      if(/^・/.test(p)){
+        sawItem = true;
         const num = circled[bulletIndex] || `${bulletIndex + 1}.`;
         bulletIndex++;
-        return `${p1}${num} `;
-      })
-      .replace(/\*\*(.+?)\*\*/g, '<span class="gen-exname">$1</span>');
+        const body = boldify(p.replace(/^・\s*/, ""));
+        return `<div class="gen-item"><div class="gen-item-num">${num}</div><div class="gen-item-body">${body}</div></div>`;
+      }
+      const cls = sawItem ? "gen-summary" : "gen-para";
+      return `<div class="${cls}">${boldify(p)}</div>`;
+    }).join("");
 
-    resultEl.innerHTML = `<div class="gen-note">${highlighted}</div>`;
+    resultEl.innerHTML = html;
   }catch(err){
     resultEl.innerHTML = `<div class="error-box">生成に失敗しました：${escapeHtml(err.message)}<br>Worker URLとレスポンス形式をご確認ください。</div>`;
   }finally{
