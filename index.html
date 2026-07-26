@@ -82,7 +82,7 @@
     border:1px solid var(--line);color:#6a6558;
   }
   .badge.layer{background:var(--paper-dim);}
-  .badge.diff{background:var(--clay-dim);color:var(--clay);border-color:transparent;}
+  .badge.diff{background:#FAEEDA;color:#854F0B;border-color:transparent;font-weight:600;}
 
   .empty-state{
     text-align:center;padding:40px 20px;color:#928d80;font-size:14px;
@@ -99,7 +99,7 @@
   .tag-chip{font-size:11px;background:var(--paper-dim);border-radius:20px;padding:3px 9px;color:#5c574c;}
   .tag-chip.tag-layer{background:#e2e9f0;color:#3d5a80;}
   .tag-chip.tag-domain{background:#f1e6d0;color:#8a6d1f;}
-  .tag-chip.tag-difficulty{background:var(--clay-dim);color:var(--clay);}
+  .tag-chip.tag-difficulty{background:#FAEEDA;color:#854F0B;font-weight:600;}
   .tag-chip.tag-effect{background:#e4ece0;color:var(--moss);}
 
   .warn-box{
@@ -127,7 +127,7 @@
   .branch-tab[data-branch="regressions"].active{background:#BA7517;color:#FAEEDA;}
   .branch-tab[data-branch="errors"]{background:#FCEBEB;color:#A32D2D;}
   .branch-tab[data-branch="errors"].active{background:#A32D2D;color:#FCEBEB;}
-  .gen-exname{color:var(--moss);font-weight:700;font-size:14.5px;}
+  .gen-exname{color:var(--moss);font-weight:700;font-size:16px;}
   .branch-panel{display:none;margin-top:10px;}
   .branch-panel.active{display:block;}
   .chip-list{display:flex;flex-direction:column;gap:6px;}
@@ -231,13 +231,13 @@
 
   <nav class="tabbar">
     <button class="active" id="tab-list" onclick="switchTab('list')">
-      <span class="ic">📋</span>一覧
+      <span class="ic"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>一覧
     </button>
     <button id="tab-detail" onclick="switchTab('detail')" style="display:none;">
-      <span class="ic">📖</span>詳細
+      <span class="ic"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5c2-1 5-1.3 8 0v13c-3-1.3-6-1-8 0z"/><path d="M20 5.5c-2-1-5-1.3-8 0v13c3-1.3 6-1 8 0z"/></svg></span>詳細
     </button>
     <button id="tab-generator" onclick="switchTab('generator')">
-      <span class="ic">✨</span>生成
+      <span class="ic"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"/><circle cx="12" cy="12" r="2.3"/></svg></span>生成
     </button>
   </nav>
 </div>
@@ -270,9 +270,20 @@ function uniqueValues(list, key){
   return [...new Set(list.map(x => x[key]).filter(v => v !== null && v !== undefined && v !== ""))];
 }
 
+function splitMultiValue(str){
+  if(str === null || str === undefined || str === "") return [];
+  return String(str).split(",").map(s => s.trim()).filter(Boolean);
+}
+
+function uniqueSplitValues(list, key){
+  const set = new Set();
+  list.forEach(x => splitMultiValue(x[key]).forEach(v => set.add(v)));
+  return [...set].sort();
+}
+
 function populateFilters(){
-  const layers = uniqueValues(allExercises, "layer");
-  const domains = uniqueValues(allExercises, "domain");
+  const layers = uniqueSplitValues(allExercises, "layer");
+  const domains = uniqueSplitValues(allExercises, "domain");
   const difficulties = uniqueValues(allExercises, "difficulty");
 
   fillSelect("f-layer", layers, "レイヤー：すべて");
@@ -287,7 +298,7 @@ function fillSelect(id, values, defaultLabel, isDifficulty){
   el.innerHTML = `<option value="">${defaultLabel}</option>`;
   values.forEach(v => {
     const opt = document.createElement("option");
-    opt.value = v; opt.textContent = isDifficulty ? difficultyStars(v) : v;
+    opt.value = v; opt.textContent = isDifficulty ? "★".repeat(Math.max(1, parseInt(v,10)||1)) : v;
     el.appendChild(opt);
   });
 }
@@ -299,8 +310,8 @@ function applyFilters(){
   const search = document.getElementById("f-search").value.trim().toLowerCase();
 
   return allExercises.filter(ex => {
-    if(layer && ex.layer !== layer) return false;
-    if(domain && ex.domain !== domain) return false;
+    if(layer && !splitMultiValue(ex.layer).includes(layer)) return false;
+    if(domain && !splitMultiValue(ex.domain).includes(domain)) return false;
     if(difficulty && String(ex.difficulty) !== String(difficulty)) return false;
     if(search){
       const hay = `${ex.name_ja||""} ${ex.name_en||""} ${ex.name_custom||""}`.toLowerCase();
@@ -330,8 +341,8 @@ function renderList(){
         <div class="name-ja">${escapeHtml(ex.name_ja || ex.name_custom || "(名称未設定)")}</div>
         ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
         <div class="meta" style="margin-top:6px;">
-          ${ex.layer ? `<span class="badge" style="background:${lc[0]};color:${lc[1]};border-color:transparent;">${escapeHtml(ex.layer)}</span>` : ""}
-          ${ex.domain ? `<span class="badge" style="background:${dc[0]};color:${dc[1]};border-color:transparent;">${escapeHtml(String(ex.domain).split(",")[0].trim())}</span>` : ""}
+          ${ex.layer ? `<span class="badge" style="background:${lc[0]};color:${lc[1]};border-color:transparent;font-weight:600;">${escapeHtml(ex.layer)}</span>` : ""}
+          ${ex.domain ? `<span class="badge" style="background:${dc[0]};color:${dc[1]};border-color:transparent;font-weight:600;">${escapeHtml(String(ex.domain).split(",")[0].trim())}</span>` : ""}
         </div>
       </div>
       <div class="meta">
@@ -434,8 +445,8 @@ function renderDetail(ex){
       <h2>${escapeHtml(ex.name_ja || ex.name_custom)}</h2>
       ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
       <div class="tags">
-        ${ex.layer ? `<span class="tag-chip" style="background:${layerColorPair(ex.layer)[0]};color:${layerColorPair(ex.layer)[1]};">${escapeHtml(ex.layer)}</span>` : ""}
-        ${ex.domain ? `<span class="tag-chip" style="background:${domainColorPair(ex.domain)[0]};color:${domainColorPair(ex.domain)[1]};">${escapeHtml(ex.domain)}</span>` : ""}
+        ${ex.layer ? `<span class="tag-chip" style="background:${layerColorPair(ex.layer)[0]};color:${layerColorPair(ex.layer)[1]};font-weight:600;">${escapeHtml(ex.layer)}</span>` : ""}
+        ${ex.domain ? `<span class="tag-chip" style="background:${domainColorPair(ex.domain)[0]};color:${domainColorPair(ex.domain)[1]};font-weight:600;">${escapeHtml(ex.domain)}</span>` : ""}
         ${ex.difficulty ? `<span class="tag-chip tag-difficulty">${difficultyStars(ex.difficulty)}</span>` : ""}
         ${tags.map(t => `<span class="tag-chip tag-effect">${escapeHtml(t)}</span>`).join("")}
       </div>
@@ -539,7 +550,7 @@ async function generateProgram(){
 
   // 候補種目リストを簡潔な形でプロンプトに渡す
   const candidateList = allExercises
-    .filter(ex => (!domain || ex.domain === domain))
+    .filter(ex => (!domain || splitMultiValue(ex.domain).includes(domain)))
     .map(ex => `・${ex.name_ja}｜レイヤー:${ex.layer||"-"}｜領域:${ex.domain||"-"}｜難易度:${ex.difficulty||"-"}`)
     .join("\n");
 
@@ -578,7 +589,15 @@ ${candidateList}
     const data = await res.json();
     // Workerのレスポンス形式は既存プロキシに合わせて調整してください（例：{ text: "..." } を想定）
     const text = data.text || data.result || data.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
-    const highlighted = escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<span class="gen-exname">$1</span>');
+    const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
+    let bulletIndex = 0;
+    let highlighted = escapeHtml(text)
+      .replace(/(^|\n)・/g, (m, p1) => {
+        const num = circled[bulletIndex] || `${bulletIndex + 1}.`;
+        bulletIndex++;
+        return `${p1}${num} `;
+      })
+      .replace(/\*\*(.+?)\*\*/g, '<span class="gen-exname">$1</span>');
 
     resultEl.innerHTML = `<div class="gen-note">${highlighted}</div>`;
   }catch(err){
