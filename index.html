@@ -71,6 +71,14 @@
 
   .count-row{font-size:12px;color:#767267;margin-bottom:10px;}
 
+  .filter-info{
+    background:#fff;border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:14px;
+  }
+  .filter-info + .filter-info{margin-top:-4px;}
+  .filter-info .fi-title{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--moss);margin-bottom:4px;}
+  .filter-info .fi-content{font-size:12.5px;line-height:1.7;color:#5c574c;}
+
   /* Exercise cards */
   .ex-list{display:flex;flex-direction:column;gap:12px;}
   .ex-card{
@@ -206,6 +214,7 @@
       <select id="f-difficulty"><option value="">難易度：すべて</option></select>
     </div>
     <input type="search" id="f-search" placeholder="種目名で検索">
+    <div id="filterInfo"></div>
     <div class="count-row" id="listCount"></div>
     <div class="ex-list" id="exList"></div>
   </section>
@@ -301,19 +310,19 @@ function populateFilters(){
   const domains = uniqueSplitValues(allExercises, "domain");
   const difficulties = uniqueValues(allExercises, "difficulty");
 
-  fillSelect("f-layer", layers, "レイヤー：すべて");
+  fillSelect("f-layer", layers, "レイヤー：すべて", false, layerLabel);
   fillSelect("f-domain", domains, "領域：すべて");
   fillSelect("f-difficulty", difficulties, "難易度：すべて", true);
   fillSelect("g-level", difficulties, "指定なし", true);
   fillSelect("g-domain", domains, "指定なし");
 }
 
-function fillSelect(id, values, defaultLabel, isDifficulty){
+function fillSelect(id, values, defaultLabel, isDifficulty, labelFn){
   const el = document.getElementById(id);
   el.innerHTML = `<option value="">${defaultLabel}</option>`;
   values.forEach(v => {
     const opt = document.createElement("option");
-    opt.value = v; opt.textContent = isDifficulty ? "★".repeat(Math.max(1, parseInt(v,10)||1)) : v;
+    opt.value = v; opt.textContent = isDifficulty ? "★".repeat(Math.max(1, parseInt(v,10)||1)) : (labelFn ? labelFn(v) : v);
     el.appendChild(opt);
   });
 }
@@ -340,7 +349,22 @@ function renderList(){
   const filtered = applyFilters();
   const listEl = document.getElementById("exList");
   const countEl = document.getElementById("listCount");
+  const infoEl = document.getElementById("filterInfo");
   countEl.textContent = `${filtered.length}件`;
+
+  const layerVal = document.getElementById("f-layer").value;
+  const domainVal = document.getElementById("f-domain").value;
+  let infoHtml = "";
+  if(layerVal && LAYER_INFO[layerVal]){
+    infoHtml += `<div class="filter-info"><div class="fi-title">レイヤー：${escapeHtml(LAYER_INFO[layerVal].title)}</div><div class="fi-content">内容：${escapeHtml(LAYER_INFO[layerVal].content)}</div></div>`;
+  }
+  if(domainVal){
+    const idx = domainMatchIndex(domainVal);
+    if(idx !== -1){
+      infoHtml += `<div class="filter-info"><div class="fi-title">領域：${escapeHtml(domainVal)}</div><div class="fi-content">内容：${escapeHtml(DOMAIN_CONTENT[idx])}</div></div>`;
+    }
+  }
+  infoEl.innerHTML = infoHtml;
 
   if(filtered.length === 0){
     listEl.innerHTML = `<div class="empty-state">該当するエクササイズがありません</div>`;
@@ -356,7 +380,7 @@ function renderList(){
         <div class="name-ja">${escapeHtml(ex.name_ja || ex.name_custom || "(名称未設定)")}</div>
         ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
         <div class="meta" style="margin-top:6px;">
-          ${ex.layer ? `<span class="badge" style="background:${lc[0]};color:${lc[1]};border-color:transparent;font-weight:600;">${escapeHtml(ex.layer)}</span>` : ""}
+          ${ex.layer ? `<span class="badge" style="background:${lc[0]};color:${lc[1]};border-color:transparent;font-weight:600;">${escapeHtml(layerLabels(ex.layer))}</span>` : ""}
           ${ex.domain ? `<span class="badge" style="background:${dc[0]};color:${dc[1]};border-color:transparent;font-weight:600;">${escapeHtml(String(ex.domain).split(",")[0].trim())}</span>` : ""}
         </div>
       </div>
@@ -384,6 +408,22 @@ function difficultyStars(val){
   return STAR_SVG.repeat(Math.min(n, 5));
 }
 
+const LAYER_INFO = {
+  "Layer 0": {label:"発達運動学", title:"発達運動学（Developmental Kinesiology）", content:"原始反射の統合、正中線交差、対側性協調、寝返り→ハイハイ（四つ這い）→高這い→ハーフニーリング→立位→歩行という発達順序、姿勢の系統発生的基盤"},
+  "Layer 1": {label:"神経科学的基盤", title:"神経科学的基盤（Neuroscience / Sensorimotor Science）", content:"機能神経学、感覚運動科学、前庭系（耳石器・半規管）、固有受容感覚、視覚系・眼球運動、小脳機能、神経可塑性、疼痛科学（中枢性感作・恐怖回避行動）、自律神経系の調整"},
+  "Layer 2": {label:"呼吸・姿勢制御学", title:"呼吸・姿勢制御学（Respiratory & Postural Control）", content:"横隔膜機能、腹腔内圧、インナーユニット（横隔膜・骨盤底筋・腹横筋・多裂筋）、胸郭の位置と可動性、呼吸パターン異常、自律神経（呼吸を介した副交感神経調整）"},
+  "Layer 3": {label:"運動制御学", title:"運動制御学（Motor Control）", content:"ピラティス全般（マット・リフォーマー・キャデラック・チェア・バレル）、脊柱の分節的制御、肩甲帯の安定性、運動学習理論、代償動作パターンの修正"},
+  "Layer 4": {label:"機能的動作学", title:"機能的動作学（Functional Movement Science）", content:"バイオメカニクス、動作スクリーニングと評価、動作修正、左右非対称性の評価、歩行分析、怪我予防のための動作基盤"},
+  "Layer 5": {label:"筋力・コンディショニング学", title:"筋力・コンディショニング学（Strength & Conditioning）", content:"スクワット・ヒンジ・プッシュ・プル等の基本動作パターン、ピリオダイゼーション、神経筋適応、筋肥大と筋力発揮の生理学的基盤"},
+  "Layer 6": {label:"スポーツ科学", title:"スポーツ科学（Sports Performance Science）", content:"競技特異的動作、爆発的パワー発揮、アジリティと反応速度、プライオメトリクス、ピーキングとテーパリング"}
+};
+function layerLabel(token){
+  return (LAYER_INFO[token] && LAYER_INFO[token].label) || token;
+}
+function layerLabels(layerStr){
+  return splitMultiValue(layerStr).map(layerLabel).join("・");
+}
+
 const LAYER_COLORS = {
   "0":["#E6F1FB","#0C447C"], "1":["#B5D4F4","#0C447C"], "2":["#85B7EB","#042C53"],
   "3":["#378ADD","#042C53"], "4":["#185FA5","#E6F1FB"], "5":["#0C447C","#E6F1FB"], "6":["#042C53","#B5D4F4"]
@@ -396,11 +436,28 @@ function layerColorPair(layerStr){
 }
 
 const DOMAIN_ORDER = ["リリース・準備系","モビリティ系","神経系再教育系","呼吸・姿勢再統合系","発達パターン系","アクティベーション系","コレクティブ系","ピラティス系","ファンクショナル系","ストレングス系","コンディショニング系","パフォーマンス系"];
+const DOMAIN_CONTENT = [
+  "筋膜・筋の緊張緩和、セルフミオファシャルリリース、静的・動的ストレッチ、神経系のダウンレギュレーション",
+  "関節可動域の改善、脊柱・股関節・胸郭の分節的可動性、能動的な可動域拡大",
+  "関節神経入力ドリル、視覚系・前庭系トレーニング、感覚統合、原始反射の統合",
+  "横隔膜再教育、腹腔内圧トレーニング、胸郭再配置、姿勢非対称性の修正",
+  "原始パターン（仰向け・寝返り）、四つ這いパターン、ハーフニーリングパターン、立位・歩行パターンの再教育",
+  "神経筋活性化、モーターコントロール、インナーユニット活性化、臀筋・肩甲帯の個別活性化",
+  "代償動作の修正、左右非対称性の修正、疼痛回避パターンの修正",
+  "マット・リフォーマー・キャデラック・チェア・バレルを用いた動作制御トレーニング",
+  "複合動作の統合、実生活動作（ヒンジ・スクワット等）への応用、動作連鎖トレーニング",
+  "自重トレーニング、フリーウェイト、マシントレーニング、基本的な筋力発揮パターン",
+  "有酸素トレーニング、インターバルトレーニング、代謝系コンディショニング、リカバリー",
+  "競技特異的トレーニング、スプリント、アジリティ、パワー開発、ピーキング"
+];
 const DOMAIN_COLORS = ["#FDF1EC","#FADFCF","#F5C7AE","#EEA987","#E58C68","#DB7050","#C85A3E","#AC482F","#8F3A26","#73301F","#571F14","#3D140D"];
 const DOMAIN_TEXT = ["#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC"];
-function domainColorPair(domainStr){
+function domainMatchIndex(domainStr){
   const first = String(domainStr||"").split(",")[0].trim();
-  const idx = DOMAIN_ORDER.findIndex(d => first.includes(d));
+  return DOMAIN_ORDER.findIndex(d => first.includes(d));
+}
+function domainColorPair(domainStr){
+  const idx = domainMatchIndex(domainStr);
   if(idx === -1) return ["#eae6db", "#5c574c"];
   return [DOMAIN_COLORS[idx], DOMAIN_TEXT[idx]];
 }
@@ -459,7 +516,7 @@ function renderDetail(ex){
       <h2>${escapeHtml(ex.name_ja || ex.name_custom)}</h2>
       ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
       <div class="tags">
-        ${ex.layer ? `<span class="tag-chip" style="background:${layerColorPair(ex.layer)[0]};color:${layerColorPair(ex.layer)[1]};font-weight:600;">${escapeHtml(ex.layer)}</span>` : ""}
+        ${ex.layer ? `<span class="tag-chip" style="background:${layerColorPair(ex.layer)[0]};color:${layerColorPair(ex.layer)[1]};font-weight:600;">${escapeHtml(layerLabels(ex.layer))}</span>` : ""}
         ${ex.domain ? `<span class="tag-chip" style="background:${domainColorPair(ex.domain)[0]};color:${domainColorPair(ex.domain)[1]};font-weight:600;">${escapeHtml(ex.domain)}</span>` : ""}
         ${ex.difficulty ? `<span class="tag-chip tag-difficulty">${difficultyStars(ex.difficulty)}</span>` : ""}
         ${tags.map(t => `<span class="tag-chip tag-effect">${escapeHtml(t)}</span>`).join("")}
