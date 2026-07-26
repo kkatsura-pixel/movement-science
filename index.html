@@ -31,6 +31,7 @@
   }
   #app{max-width:640px;margin:0 auto;}
 
+  /* Header */
   header.top{
     padding:22px 18px 16px;
     border-bottom:1px solid var(--line);
@@ -44,9 +45,11 @@
     font-size:22px;margin:4px 0 0;font-weight:600;letter-spacing:-.01em;
   }
 
+  /* Screens */
   .screen{display:none;padding:16px 18px 8px;}
   .screen.active{display:block;}
 
+  /* Filters */
   .filters{
     display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;
   }
@@ -63,6 +66,7 @@
 
   .count-row{font-size:12px;color:#767267;margin-bottom:10px;}
 
+  /* Exercise cards */
   .ex-list{display:flex;flex-direction:column;gap:8px;}
   .ex-card{
     background:#fff;border:1px solid var(--line);border-radius:var(--radius);
@@ -84,6 +88,7 @@
     text-align:center;padding:40px 20px;color:#928d80;font-size:14px;
   }
 
+  /* Detail screen */
   .back-btn{
     display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--moss);
     background:none;border:none;padding:0 0 14px;cursor:pointer;font-weight:600;
@@ -121,6 +126,7 @@
   .chip-link:active{background:var(--paper-dim);}
   .chip-link .arrow{color:var(--moss);}
 
+  /* Generator */
   .gform{display:flex;flex-direction:column;gap:12px;}
   .gform label{font-size:12px;font-weight:700;color:#5c574c;letter-spacing:.03em;}
   .gform .field{display:flex;flex-direction:column;gap:5px;}
@@ -143,6 +149,7 @@
     margin-top:14px;background:var(--clay-dim);color:#6b2f1f;border-radius:8px;padding:12px 14px;font-size:13px;
   }
 
+  /* Tab bar */
   nav.tabbar{
     position:fixed;bottom:0;left:0;right:0;background:var(--paper);
     border-top:1px solid var(--line);display:flex;z-index:30;
@@ -164,6 +171,7 @@
     <h1 id="headerTitle">エクササイズ一覧</h1>
   </header>
 
+  <!-- 一覧画面 -->
   <section class="screen active" id="screen-list">
     <div class="filters">
       <select id="f-layer"><option value="">レイヤー：すべて</option></select>
@@ -175,11 +183,13 @@
     <div class="ex-list" id="exList"></div>
   </section>
 
+  <!-- 詳細画面 -->
   <section class="screen" id="screen-detail">
     <button class="back-btn" onclick="goToList()">← 一覧に戻る</button>
     <div id="detailBody"></div>
   </section>
 
+  <!-- ジェネレーター画面 -->
   <section class="screen" id="screen-generator">
     <div class="gform">
       <div class="field">
@@ -221,9 +231,11 @@
 </div>
 
 <script>
+/* ============ 設定（このセクションだけ環境に合わせて調整） ============ */
 const SUPABASE_URL = "https://fxqwdnuavjazpozndxkq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_SLEtu3hH-UlcsdspfoOr1Q_g3vBV8B5";
 const WORKER_URL = "https://movement-science-proxy.koshiro-katsura.workers.dev";
+/* ==================================================================== */
 
 let allExercises = [];
 let currentDetail = null;
@@ -459,6 +471,7 @@ function switchTab(name, fromCardClick){
   document.getElementById("headerTitle").textContent = titles[name];
 }
 
+/* ============ プログラムジェネレーター（Gemini API / Cloudflare Worker経由） ============ */
 async function generateProgram(){
   const purpose = document.getElementById("g-purpose").value.trim();
   const condition = document.getElementById("g-condition").value.trim();
@@ -475,6 +488,7 @@ async function generateProgram(){
   btn.disabled = true;
   resultEl.innerHTML = `<div class="loading">生成中です…</div>`;
 
+  // 候補種目リストを簡潔な形でプロンプトに渡す
   const candidateList = allExercises
     .filter(ex => (!domain || ex.domain === domain))
     .map(ex => `・${ex.name_ja}｜レイヤー:${ex.layer||"-"}｜領域:${ex.domain||"-"}｜難易度:${ex.difficulty||"-"}`)
@@ -513,6 +527,7 @@ ${candidateList}
     }
 
     const data = await res.json();
+    // Workerのレスポンス形式は既存プロキシに合わせて調整してください（例：{ text: "..." } を想定）
     const text = data.text || data.result || data.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
 
     resultEl.innerHTML = `<div class="gen-note">${escapeHtml(text)}</div>`;
@@ -523,6 +538,7 @@ ${candidateList}
   }
 }
 
+/* ============ 初期化 ============ */
 async function init(){
   document.getElementById("exList").innerHTML = `<div class="empty-state">読み込み中…</div>`;
   try{
