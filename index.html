@@ -327,7 +327,7 @@ function toArray(val){
       const parsed = JSON.parse(val);
       if(Array.isArray(parsed)) return parsed;
     }catch(e){}
-    return val.split(/[,、]/).map(s => s.trim()).filter(Boolean);
+    return val.split(/[,、。]/).map(s => s.trim()).filter(Boolean);
   }
   return [];
 }
