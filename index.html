@@ -47,7 +47,7 @@
   }
   header.top h1{
     font-family:var(--serif-en);
-    font-size:28px;margin:8px 0 0;font-weight:600;letter-spacing:.03em;
+    font-size:26px;margin:8px 0 0;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
   }
 
   /* Screens */
@@ -72,12 +72,12 @@
   .count-row{font-size:12px;color:#767267;margin-bottom:10px;}
 
   .filter-info{
-    background:#fff;border:1px solid var(--line);border-left:3px solid var(--gold);
-    border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:14px;
+    background:#eef2e9;border:1px solid var(--moss-dim);border-left:4px solid var(--gold);
+    border-radius:0 12px 12px 0;padding:16px 18px;margin-bottom:14px;
   }
-  .filter-info + .filter-info{margin-top:-4px;}
-  .filter-info .fi-title{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--moss);margin-bottom:4px;}
-  .filter-info .fi-content{font-size:12.5px;line-height:1.7;color:#5c574c;}
+  .filter-info + .filter-info{margin-top:0;}
+  .filter-info .fi-title{font-family:var(--serif);font-size:15.5px;font-weight:700;color:#2e3d27;margin-bottom:5px;}
+  .filter-info .fi-content{font-size:12.5px;line-height:1.75;color:#465239;}
 
   /* Exercise cards */
   .ex-list{display:flex;flex-direction:column;gap:12px;}
@@ -174,7 +174,7 @@
     line-height:1.6;min-width:22px;
   }
   .gen-item-body{font-size:14px;line-height:1.8;color:#4a463c;}
-  .gen-exname{color:var(--moss);font-weight:700;font-size:16px;display:inline-block;margin-bottom:2px;}
+  .gen-exname{color:var(--moss);font-weight:700;font-size:16px;display:block;margin-bottom:6px;}
   .gen-summary{
     margin-top:22px;padding-top:18px;border-top:2px solid var(--gold);
     font-size:13.5px;line-height:1.85;color:#4a463c;
@@ -214,7 +214,7 @@
       <select id="f-difficulty"><option value="">難易度：すべて</option></select>
     </div>
     <input type="search" id="f-search" placeholder="種目名で検索">
-    <div id="filterInfo"></div>
+    <div id="filterInfo" style="margin-top:14px;"></div>
     <div class="count-row" id="listCount"></div>
     <div class="ex-list" id="exList"></div>
   </section>
