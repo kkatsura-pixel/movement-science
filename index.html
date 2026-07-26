@@ -265,17 +265,17 @@ function populateFilters(){
 
   fillSelect("f-layer", layers, "レイヤー：すべて");
   fillSelect("f-domain", domains, "領域：すべて");
-  fillSelect("f-difficulty", difficulties, "難易度：すべて");
-  fillSelect("g-level", difficulties, "指定なし");
+  fillSelect("f-difficulty", difficulties, "難易度：すべて", true);
+  fillSelect("g-level", difficulties, "指定なし", true);
   fillSelect("g-domain", domains, "指定なし");
 }
 
-function fillSelect(id, values, defaultLabel){
+function fillSelect(id, values, defaultLabel, isDifficulty){
   const el = document.getElementById(id);
   el.innerHTML = `<option value="">${defaultLabel}</option>`;
   values.forEach(v => {
     const opt = document.createElement("option");
-    opt.value = v; opt.textContent = v;
+    opt.value = v; opt.textContent = isDifficulty ? difficultyStars(v) : v;
     el.appendChild(opt);
   });
 }
@@ -289,7 +289,7 @@ function applyFilters(){
   return allExercises.filter(ex => {
     if(layer && ex.layer !== layer) return false;
     if(domain && ex.domain !== domain) return false;
-    if(difficulty && ex.difficulty !== difficulty) return false;
+    if(difficulty && String(ex.difficulty) !== String(difficulty)) return false;
     if(search){
       const hay = `${ex.name_ja||""} ${ex.name_en||""} ${ex.name_custom||""}`.toLowerCase();
       if(!hay.includes(search)) return false;
@@ -317,7 +317,7 @@ function renderList(){
       </div>
       <div class="meta">
         ${ex.layer ? `<span class="badge layer">${escapeHtml(ex.layer)}</span>` : ""}
-        ${ex.difficulty ? `<span class="badge diff">${escapeHtml(ex.difficulty)}</span>` : ""}
+        ${ex.difficulty ? `<span class="badge diff">${difficultyStars(ex.difficulty)}</span>` : ""}
       </div>
     </div>
   `).join("");
@@ -329,6 +329,12 @@ function escapeHtml(str){
 }
 function escapeAttr(str){
   return String(str||"").replace(/'/g, "\\'");
+}
+
+function difficultyStars(val){
+  const n = parseInt(val, 10);
+  if(!n || n < 1) return escapeHtml(val);
+  return "⭐️".repeat(Math.min(n, 5));
 }
 
 function toArray(val){
@@ -387,7 +393,7 @@ function renderDetail(ex){
       <div class="tags">
         ${ex.layer ? `<span class="tag-chip">${escapeHtml(ex.layer)}</span>` : ""}
         ${ex.domain ? `<span class="tag-chip">${escapeHtml(ex.domain)}</span>` : ""}
-        ${ex.difficulty ? `<span class="tag-chip">${escapeHtml(ex.difficulty)}</span>` : ""}
+        ${ex.difficulty ? `<span class="tag-chip">${difficultyStars(ex.difficulty)}</span>` : ""}
         ${tags.map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join("")}
       </div>
     </div>
@@ -516,10 +522,10 @@ ${candidateList}
 2. 最後に実施順序と全体の狙いを短くまとめてください。`;
 
   try{
-    const res = await fetch(WORKER_URL, {
+    const res = await fetch(`${WORKER_URL}?target=gemini`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
 
     if(!res.ok){
