@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>統合運動科学リファレンス</title>
+<style>
+  :root{
+    --ink:#1c2521;
+    --paper:#f6f4ee;
+    --paper-dim:#eae6db;
+    --line:#d8d2c2;
+    --moss:#5b6e4f;
+    --moss-dim:#8a9a7c;
+    --clay:#a8503a;
+    --clay-dim:#e7d3cb;
+    --gold:#b08d3f;
+    --radius:10px;
+    --serif: Georgia, "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:74px;
+    min-height:100vh;
+  }
+  #app{max-width:640px;margin:0 auto;}
+
+  header.top{
+    padding:22px 18px 16px;
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:var(--paper);z-index:20;
+  }
+  header.top .eyebrow{
+    font-size:11px;letter-spacing:.14em;color:var(--moss);text-transform:uppercase;font-weight:600;
+  }
+  header.top h1{
+    font-family:var(--serif);
+    font-size:22px;margin:4px 0 0;font-weight:600;letter-spacing:-.01em;
+  }
+
+  .screen{display:none;padding:16px 18px 8px;}
+  .screen.active{display:block;}
+
+  .filters{
+    display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;
+  }
+  select{
+    flex:1;min-width:0;
+    appearance:none;-webkit-appearance:none;
+    background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:9px 10px;font-size:13px;color:var(--ink);font-family:var(--sans);
+  }
+  input[type=text], input[type=search]{
+    width:100%;border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;font-size:14px;background:#fff;color:var(--ink);font-family:var(--sans);
+  }
+
+  .count-row{font-size:12px;color:#767267;margin-bottom:10px;}
+
+  .ex-list{display:flex;flex-direction:column;gap:8px;}
+  .ex-card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:13px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+    cursor:pointer;
+  }
+  .ex-card:active{background:var(--paper-dim);}
+  .ex-card .name-ja{font-family:var(--serif);font-size:16px;font-weight:600;}
+  .ex-card .name-en{font-size:11px;color:#8a857a;margin-top:2px;}
+  .ex-card .meta{display:flex;gap:6px;flex-shrink:0;}
+  .badge{
+    font-size:10px;padding:3px 7px;border-radius:20px;white-space:nowrap;
+    border:1px solid var(--line);color:#6a6558;
+  }
+  .badge.layer{background:var(--paper-dim);}
+  .badge.diff{background:var(--clay-dim);color:var(--clay);border-color:transparent;}
+
+  .empty-state{
+    text-align:center;padding:40px 20px;color:#928d80;font-size:14px;
+  }
+
+  .back-btn{
+    display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--moss);
+    background:none;border:none;padding:0 0 14px;cursor:pointer;font-weight:600;
+  }
+  .detail-head h2{font-family:var(--serif);font-size:24px;margin:0;font-weight:700;}
+  .detail-head .name-en{font-size:13px;color:#8a857a;margin-top:2px;}
+  .detail-head .tags{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;}
+  .tag-chip{font-size:11px;background:var(--paper-dim);border-radius:20px;padding:3px 9px;color:#5c574c;}
+
+  .warn-box{
+    margin-top:16px;background:var(--clay-dim);border-left:3px solid var(--clay);
+    border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.6;color:#6b2f1f;
+  }
+  .warn-box .label{font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;color:var(--clay);}
+
+  .section{margin-top:20px;}
+  .section .label{
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--moss);font-weight:700;margin-bottom:6px;
+  }
+  .section .body{font-size:14px;line-height:1.75;color:#33362f;white-space:pre-wrap;}
+
+  .branch-tabs{display:flex;gap:6px;margin-top:8px;}
+  .branch-tab{
+    flex:1;text-align:center;font-size:12px;padding:8px 4px;border-radius:8px;
+    background:var(--paper-dim);color:#5c574c;cursor:pointer;border:1px solid transparent;
+  }
+  .branch-tab.active{background:var(--ink);color:var(--paper);}
+  .branch-panel{display:none;margin-top:10px;}
+  .branch-panel.active{display:block;}
+  .chip-list{display:flex;flex-direction:column;gap:6px;}
+  .chip-link{
+    background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 12px;
+    font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  }
+  .chip-link:active{background:var(--paper-dim);}
+  .chip-link .arrow{color:var(--moss);}
+
+  .gform{display:flex;flex-direction:column;gap:12px;}
+  .gform label{font-size:12px;font-weight:700;color:#5c574c;letter-spacing:.03em;}
+  .gform .field{display:flex;flex-direction:column;gap:5px;}
+  textarea{
+    width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+    font-size:14px;font-family:var(--sans);min-height:64px;resize:vertical;background:#fff;color:var(--ink);
+  }
+  .gen-btn{
+    margin-top:4px;background:var(--moss);color:#fff;border:none;border-radius:8px;
+    padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);
+  }
+  .gen-btn:disabled{background:#b7bfae;}
+  .gen-result{margin-top:20px;}
+  .gen-note{
+    background:var(--paper-dim);border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.7;
+    color:#4a463c;margin-bottom:14px;white-space:pre-wrap;
+  }
+  .loading{font-size:13px;color:var(--moss);margin-top:14px;}
+  .error-box{
+    margin-top:14px;background:var(--clay-dim);color:#6b2f1f;border-radius:8px;padding:12px 14px;font-size:13px;
+  }
+
+  nav.tabbar{
+    position:fixed;bottom:0;left:0;right:0;background:var(--paper);
+    border-top:1px solid var(--line);display:flex;z-index:30;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  nav.tabbar button{
+    flex:1;background:none;border:none;padding:11px 4px 9px;font-size:11px;
+    color:#9a9587;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--sans);
+  }
+  nav.tabbar button .ic{font-size:19px;line-height:1;}
+  nav.tabbar button.active{color:var(--moss);font-weight:700;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="top">
+    <div class="eyebrow">Movement Science</div>
+    <h1 id="headerTitle">エクササイズ一覧</h1>
+  </header>
+
+  <section class="screen active" id="screen-list">
+    <div class="filters">
+      <select id="f-layer"><option value="">レイヤー：すべて</option></select>
+      <select id="f-domain"><option value="">領域：すべて</option></select>
+      <select id="f-difficulty"><option value="">難易度：すべて</option></select>
+    </div>
+    <input type="search" id="f-search" placeholder="種目名で検索">
+    <div class="count-row" id="listCount"></div>
+    <div class="ex-list" id="exList"></div>
+  </section>
+
+  <section class="screen" id="screen-detail">
+    <button class="back-btn" onclick="goToList()">← 一覧に戻る</button>
+    <div id="detailBody"></div>
+  </section>
+
+  <section class="screen" id="screen-generator">
+    <div class="gform">
+      <div class="field">
+        <label>目的</label>
+        <input type="text" id="g-purpose" placeholder="例：肩こり改善、姿勢改善、パフォーマンス向上">
+      </div>
+      <div class="field">
+        <label>身体状態・注意点</label>
+        <textarea id="g-condition" placeholder="例：右肩に既往あり、座位時間が長い"></textarea>
+      </div>
+      <div class="field">
+        <label>レベル</label>
+        <select id="g-level">
+          <option value="">指定なし</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>領域</label>
+        <select id="g-domain">
+          <option value="">指定なし</option>
+        </select>
+      </div>
+      <button class="gen-btn" id="genBtn" onclick="generateProgram()">3〜5種目を生成する</button>
+    </div>
+    <div class="gen-result" id="genResult"></div>
+  </section>
+
+  <nav class="tabbar">
+    <button class="active" id="tab-list" onclick="switchTab('list')">
+      <span class="ic">📋</span>一覧
+    </button>
+    <button id="tab-detail" onclick="switchTab('detail')" style="display:none;">
+      <span class="ic">📖</span>詳細
+    </button>
+    <button id="tab-generator" onclick="switchTab('generator')">
+      <span class="ic">✨</span>生成
+    </button>
+  </nav>
+</div>
+
+<script>
+const SUPABASE_URL = "https://fxqwdnuavjazpozndxkq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_SLEtu3hH-UlcsdspfoOr1Q_g3vBV8B5";
+const WORKER_URL = "https://movement-science-proxy.koshiro-katsura.workers.dev";
+
+let allExercises = [];
+let currentDetail = null;
+
+async function fetchExercises(){
+  const url = `${SUPABASE_URL}/rest/v1/exercises?select=*`;
+  const res = await fetch(url, {
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    }
+  });
+  if(!res.ok){
+    throw new Error(`Supabase取得エラー: ${res.status}`);
+  }
+  return await res.json();
+}
+
+function uniqueValues(list, key){
+  return [...new Set(list.map(x => x[key]).filter(v => v !== null && v !== undefined && v !== ""))];
+}
+
+function populateFilters(){
+  const layers = uniqueValues(allExercises, "layer");
+  const domains = uniqueValues(allExercises, "domain");
+  const difficulties = uniqueValues(allExercises, "difficulty");
+
+  fillSelect("f-layer", layers, "レイヤー：すべて");
+  fillSelect("f-domain", domains, "領域：すべて");
+  fillSelect("f-difficulty", difficulties, "難易度：すべて");
+  fillSelect("g-level", difficulties, "指定なし");
+  fillSelect("g-domain", domains, "指定なし");
+}
+
+function fillSelect(id, values, defaultLabel){
+  const el = document.getElementById(id);
+  el.innerHTML = `<option value="">${defaultLabel}</option>`;
+  values.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v; opt.textContent = v;
+    el.appendChild(opt);
+  });
+}
+
+function applyFilters(){
+  const layer = document.getElementById("f-layer").value;
+  const domain = document.getElementById("f-domain").value;
+  const difficulty = document.getElementById("f-difficulty").value;
+  const search = document.getElementById("f-search").value.trim().toLowerCase();
+
+  return allExercises.filter(ex => {
+    if(layer && ex.layer !== layer) return false;
+    if(domain && ex.domain !== domain) return false;
+    if(difficulty && ex.difficulty !== difficulty) return false;
+    if(search){
+      const hay = `${ex.name_ja||""} ${ex.name_en||""} ${ex.name_custom||""}`.toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+}
+
+function renderList(){
+  const filtered = applyFilters();
+  const listEl = document.getElementById("exList");
+  const countEl = document.getElementById("listCount");
+  countEl.textContent = `${filtered.length}件`;
+
+  if(filtered.length === 0){
+    listEl.innerHTML = `<div class="empty-state">該当するエクササイズがありません</div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(ex => `
+    <div class="ex-card" onclick="openDetailByName('${escapeAttr(ex.name_ja)}')">
+      <div>
+        <div class="name-ja">${escapeHtml(ex.name_ja || ex.name_custom || "(名称未設定)")}</div>
+        ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
+      </div>
+      <div class="meta">
+        ${ex.layer ? `<span class="badge layer">${escapeHtml(ex.layer)}</span>` : ""}
+        ${ex.difficulty ? `<span class="badge diff">${escapeHtml(ex.difficulty)}</span>` : ""}
+      </div>
+    </div>
+  `).join("");
+}
+
+function escapeHtml(str){
+  if(str === null || str === undefined) return "";
+  return String(str).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function escapeAttr(str){
+  return String(str||"").replace(/'/g, "\\'");
+}
+
+function toArray(val){
+  if(Array.isArray(val)) return val;
+  if(val === null || val === undefined || val === "") return [];
+  if(typeof val === "string"){
+    try{
+      const parsed = JSON.parse(val);
+      if(Array.isArray(parsed)) return parsed;
+    }catch(e){}
+    return val.split(/[,、]/).map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function openDetailByName(name){
+  const ex = allExercises.find(e => e.name_ja === name);
+  if(!ex) return;
+  currentDetail = ex;
+  renderDetail(ex);
+  switchTab("detail", true);
+}
+
+function renderDetail(ex){
+  const tags = toArray(ex.tags);
+  const before = toArray(ex.before_exercises);
+  const after = toArray(ex.after_exercises);
+  const progressions = toArray(ex.progressions);
+  const regressions = toArray(ex.regressions);
+  const errorCorrections = toArray(ex.error_corrections);
+  const related = toArray(ex.related_exercises);
+
+  document.getElementById("tab-detail").style.display = "flex";
+  document.getElementById("headerTitle").textContent = ex.name_ja || ex.name_custom || "詳細";
+
+  const sections = [
+    ["概要", ex.overview],
+    ["解剖学", ex.anatomy],
+    ["機能解剖学", ex.functional_anatomy],
+    ["神経科学的視点", ex.neuroscience],
+    ["キューイング", ex.cueing],
+    ["よくあるエラーパターン", ex.error_patterns],
+    ["確認事項", ex.confirmation],
+  ].filter(([_, v]) => v);
+
+  const branchTabs = [
+    {key:"progressions", label:"プログレッション", data: progressions},
+    {key:"regressions", label:"リグレッション", data: regressions},
+    {key:"errors", label:"エラー別修正", data: errorCorrections},
+  ];
+
+  document.getElementById("detailBody").innerHTML = `
+    <div class="detail-head">
+      <h2>${escapeHtml(ex.name_ja || ex.name_custom)}</h2>
+      ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
+      <div class="tags">
+        ${ex.layer ? `<span class="tag-chip">${escapeHtml(ex.layer)}</span>` : ""}
+        ${ex.domain ? `<span class="tag-chip">${escapeHtml(ex.domain)}</span>` : ""}
+        ${ex.difficulty ? `<span class="tag-chip">${escapeHtml(ex.difficulty)}</span>` : ""}
+        ${tags.map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join("")}
+      </div>
+    </div>
+
+    ${ex.contraindications ? `
+      <div class="warn-box">
+        <div class="label">禁忌</div>
+        ${escapeHtml(ex.contraindications)}
+      </div>` : ""}
+    ${ex.precautions ? `
+      <div class="warn-box">
+        <div class="label">注意事項</div>
+        ${escapeHtml(ex.precautions)}
+      </div>` : ""}
+
+    ${sections.map(([label, body]) => `
+      <div class="section">
+        <div class="label">${label}</div>
+        <div class="body">${escapeHtml(body)}</div>
+      </div>
+    `).join("")}
+
+    ${(before.length || after.length) ? `
+      <div class="section">
+        <div class="label">流れ</div>
+        <div class="body">
+          ${before.length ? `<strong>前段：</strong>${before.map(escapeHtml).join(" / ")}<br>` : ""}
+          ${after.length ? `<strong>後段：</strong>${after.map(escapeHtml).join(" / ")}` : ""}
+        </div>
+      </div>` : ""}
+
+    <div class="section">
+      <div class="label">分岐</div>
+      <div class="branch-tabs">
+        ${branchTabs.map((b, i) => `
+          <div class="branch-tab ${i===0?'active':''}" data-branch="${b.key}" onclick="switchBranch('${b.key}')">${b.label}<br>(${b.data.length})</div>
+        `).join("")}
+      </div>
+      ${branchTabs.map((b, i) => `
+        <div class="branch-panel ${i===0?'active':''}" id="branch-${b.key}">
+          ${renderChipList(b.data)}
+        </div>
+      `).join("")}
+    </div>
+
+    ${related.length ? `
+      <div class="section">
+        <div class="label">関連種目</div>
+        <div class="chip-list">${renderChipList(related)}</div>
+      </div>` : ""}
+  `;
+}
+
+function renderChipList(names){
+  if(!names.length) return `<div class="empty-state" style="padding:16px;">登録なし</div>`;
+  return `<div class="chip-list">${names.map(n => {
+    const exists = allExercises.some(e => e.name_ja === n);
+    return `<div class="chip-link" ${exists ? `onclick="openDetailByName('${escapeAttr(n)}')"` : ""}>
+      <span>${escapeHtml(n)}</span>
+      ${exists ? `<span class="arrow">›</span>` : ""}
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function switchBranch(key){
+  document.querySelectorAll(".branch-tab").forEach(el => el.classList.toggle("active", el.dataset.branch === key));
+  document.querySelectorAll(".branch-panel").forEach(el => el.classList.toggle("active", el.id === `branch-${key}`));
+}
+
+function goToList(){
+  switchTab("list");
+}
+
+function switchTab(name, fromCardClick){
+  document.querySelectorAll(".screen").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll("nav.tabbar button").forEach(el => el.classList.remove("active"));
+  document.getElementById(`screen-${name}`).classList.add("active");
+  document.getElementById(`tab-${name}`).classList.add("active");
+
+  const titles = { list: "エクササイズ一覧", detail: currentDetail ? (currentDetail.name_ja||"詳細") : "詳細", generator: "プログラムジェネレーター" };
+  document.getElementById("headerTitle").textContent = titles[name];
+}
+
+async function generateProgram(){
+  const purpose = document.getElementById("g-purpose").value.trim();
+  const condition = document.getElementById("g-condition").value.trim();
+  const level = document.getElementById("g-level").value;
+  const domain = document.getElementById("g-domain").value;
+  const resultEl = document.getElementById("genResult");
+  const btn = document.getElementById("genBtn");
+
+  if(!purpose){
+    resultEl.innerHTML = `<div class="error-box">目的を入力してください。</div>`;
+    return;
+  }
+
+  btn.disabled = true;
+  resultEl.innerHTML = `<div class="loading">生成中です…</div>`;
+
+  const candidateList = allExercises
+    .filter(ex => (!domain || ex.domain === domain))
+    .map(ex => `・${ex.name_ja}｜レイヤー:${ex.layer||"-"}｜領域:${ex.domain||"-"}｜難易度:${ex.difficulty||"-"}`)
+    .join("\n");
+
+  const prompt = `あなたは運動科学と身体教育の専門家です。以下の条件に基づき、下記の候補リストの中から3〜5種目を選び、選定理由と実施順序を日本語で簡潔に提案してください。候補リストにない種目は提案しないでください。
+
+【目的】
+${purpose}
+
+【身体状態・注意点】
+${condition || "特になし"}
+
+【希望レベル】
+${level || "指定なし"}
+
+【希望領域】
+${domain || "指定なし"}
+
+【候補リスト】
+${candidateList}
+
+出力形式：
+1. 各種目名を「・種目名」の形式で明記し、選定理由を1〜2文で添えてください。
+2. 最後に実施順序と全体の狙いを短くまとめてください。`;
+
+  try{
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt })
+    });
+
+    if(!res.ok){
+      throw new Error(`Worker応答エラー: ${res.status}`);
+    }
+
+    const data = await res.json();
+    const text = data.text || data.result || data.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
+
+    resultEl.innerHTML = `<div class="gen-note">${escapeHtml(text)}</div>`;
+  }catch(err){
+    resultEl.innerHTML = `<div class="error-box">生成に失敗しました：${escapeHtml(err.message)}<br>Worker URLとレスポンス形式をご確認ください。</div>`;
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+async function init(){
+  document.getElementById("exList").innerHTML = `<div class="empty-state">読み込み中…</div>`;
+  try{
+    allExercises = await fetchExercises();
+    populateFilters();
+    renderList();
+  }catch(err){
+    document.getElementById("exList").innerHTML = `<div class="error-box" style="margin:0;">データの取得に失敗しました：${escapeHtml(err.message)}</div>`;
+  }
+
+  ["f-layer","f-domain","f-difficulty","f-search"].forEach(id => {
+    document.getElementById(id).addEventListener("input", renderList);
+  });
+}
+init();
+</script>
+</body>
+</html>
