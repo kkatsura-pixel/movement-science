@@ -76,6 +76,7 @@
     border-radius:0 12px 12px 0;padding:16px 18px;margin-bottom:14px;
   }
   .filter-info + .filter-info{margin-top:0;}
+  .filter-info .fi-label{font-size:11px;font-weight:400;color:#767267;letter-spacing:.04em;margin-bottom:3px;}
   .filter-info .fi-title{font-family:var(--serif);font-size:15.5px;font-weight:700;color:#2e3d27;margin-bottom:5px;}
   .filter-info .fi-content{font-size:12.5px;line-height:1.75;color:#465239;}
 
@@ -356,12 +357,12 @@ function renderList(){
   const domainVal = document.getElementById("f-domain").value;
   let infoHtml = "";
   if(layerVal && LAYER_INFO[layerVal]){
-    infoHtml += `<div class="filter-info"><div class="fi-title">レイヤー：${escapeHtml(LAYER_INFO[layerVal].title)}</div><div class="fi-content">内容：${escapeHtml(LAYER_INFO[layerVal].content)}</div></div>`;
+    infoHtml += `<div class="filter-info"><div class="fi-label">レイヤー</div><div class="fi-title">${escapeHtml(LAYER_INFO[layerVal].title)}</div><div class="fi-content">内容：${escapeHtml(LAYER_INFO[layerVal].content)}</div></div>`;
   }
   if(domainVal){
     const idx = domainMatchIndex(domainVal);
     if(idx !== -1){
-      infoHtml += `<div class="filter-info"><div class="fi-title">領域：${escapeHtml(domainVal)}</div><div class="fi-content">内容：${escapeHtml(DOMAIN_CONTENT[idx])}</div></div>`;
+      infoHtml += `<div class="filter-info"><div class="fi-label">領域</div><div class="fi-title">${escapeHtml(domainVal)}</div><div class="fi-content">内容：${escapeHtml(DOMAIN_CONTENT[idx])}</div></div>`;
     }
   }
   infoEl.innerHTML = infoHtml;
