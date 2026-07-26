@@ -97,6 +97,10 @@
   .detail-head .name-en{font-size:13px;color:#8a857a;margin-top:2px;}
   .detail-head .tags{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;}
   .tag-chip{font-size:11px;background:var(--paper-dim);border-radius:20px;padding:3px 9px;color:#5c574c;}
+  .tag-chip.tag-layer{background:#e2e9f0;color:#3d5a80;}
+  .tag-chip.tag-domain{background:#f1e6d0;color:#8a6d1f;}
+  .tag-chip.tag-difficulty{background:var(--clay-dim);color:var(--clay);}
+  .tag-chip.tag-effect{background:#e4ece0;color:var(--moss);}
 
   .warn-box{
     margin-top:16px;background:var(--clay-dim);border-left:3px solid var(--clay);
@@ -104,9 +108,10 @@
   }
   .warn-box .label{font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;color:var(--clay);}
 
-  .section{margin-top:20px;}
+  .section{margin-top:24px;}
   .section .label{
-    font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--moss);font-weight:700;margin-bottom:6px;
+    font-size:17px;font-family:var(--serif);color:var(--ink);font-weight:700;
+    margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line);letter-spacing:0;
   }
   .section .body{font-size:14px;line-height:1.75;color:#33362f;white-space:pre-wrap;}
 
@@ -375,6 +380,7 @@ function renderDetail(ex){
     ["解剖学", ex.anatomy],
     ["機能解剖学", ex.functional_anatomy],
     ["神経科学的視点", ex.neuroscience],
+    ["手順", ex.steps],
     ["キューイング", ex.cueing],
     ["よくあるエラーパターン", ex.error_patterns],
     ["確認事項", ex.confirmation],
@@ -391,10 +397,10 @@ function renderDetail(ex){
       <h2>${escapeHtml(ex.name_ja || ex.name_custom)}</h2>
       ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
       <div class="tags">
-        ${ex.layer ? `<span class="tag-chip">${escapeHtml(ex.layer)}</span>` : ""}
-        ${ex.domain ? `<span class="tag-chip">${escapeHtml(ex.domain)}</span>` : ""}
-        ${ex.difficulty ? `<span class="tag-chip">${difficultyStars(ex.difficulty)}</span>` : ""}
-        ${tags.map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join("")}
+        ${ex.layer ? `<span class="tag-chip tag-layer">${escapeHtml(ex.layer)}</span>` : ""}
+        ${ex.domain ? `<span class="tag-chip tag-domain">${escapeHtml(ex.domain)}</span>` : ""}
+        ${ex.difficulty ? `<span class="tag-chip tag-difficulty">${difficultyStars(ex.difficulty)}</span>` : ""}
+        ${tags.map(t => `<span class="tag-chip tag-effect">${escapeHtml(t)}</span>`).join("")}
       </div>
     </div>
 
