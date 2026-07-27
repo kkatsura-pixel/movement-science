@@ -339,6 +339,14 @@ function fillSelect(id, values, defaultLabel, isDifficulty, labelFn){
   });
 }
 
+function minLayerNumber(layerStr){
+  const nums = splitMultiValue(layerStr).map(t => {
+    const m = t.match(/(\d)/);
+    return m ? parseInt(m[1], 10) : 99;
+  });
+  return nums.length ? Math.min(...nums) : 99;
+}
+
 function applyFilters(){
   const layer = document.getElementById("f-layer").value;
   const domain = document.getElementById("f-domain").value;
@@ -354,6 +362,12 @@ function applyFilters(){
       if(!hay.includes(search)) return false;
     }
     return true;
+  }).sort((a, b) => {
+    const la = minLayerNumber(a.layer), lb = minLayerNumber(b.layer);
+    if(la !== lb) return la - lb;
+    const da = parseInt(a.difficulty, 10) || 0, db = parseInt(b.difficulty, 10) || 0;
+    if(da !== db) return da - db;
+    return (a.name_ja || "").localeCompare(b.name_ja || "", "ja");
   });
 }
 
