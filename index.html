@@ -67,6 +67,7 @@
   input[type=text], input[type=search]{
     width:100%;border:1px solid var(--line);border-radius:8px;
     padding:10px 12px;font-size:14px;background:#fff;color:var(--ink);font-family:var(--sans);
+    margin-bottom:10px;
   }
 
   .count-row{font-size:12px;color:#767267;margin-bottom:10px;}
@@ -225,7 +226,11 @@
       <select id="f-domain"><option value="">レイヤー：すべて</option></select>
       <select id="f-difficulty"><option value="">難易度：すべて</option></select>
     </div>
-    <input type="search" id="f-search" placeholder="種目名で検索">
+    <input type="search" id="f-tags" placeholder="効果で検索（例：脊柱可動性改善）">
+    <input type="search" id="f-search" placeholder="目的で検索（種目名・概要から検索）">
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#5c574c;margin-bottom:10px;">
+      <input type="checkbox" id="f-fav-only" style="width:auto;margin:0;"> お気に入りのみ表示
+    </label>
     <div id="filterInfo" style="margin-top:14px;"></div>
     <div class="count-row" id="listCount"></div>
     <div class="ex-list" id="exList"></div>
@@ -260,7 +265,22 @@
           <option value="">指定なし</option>
         </select>
       </div>
-      <button class="gen-btn" id="genBtn" onclick="generateProgram()">3〜5種目を生成する</button>
+      <div class="field">
+        <label>年齢</label>
+        <input type="number" id="g-age" placeholder="例：35" min="1" max="120">
+      </div>
+      <div class="field">
+        <label>所要時間</label>
+        <select id="g-duration">
+          <option value="">指定なし</option>
+          <option value="10">10分</option>
+          <option value="20">20分</option>
+          <option value="30">30分</option>
+          <option value="45">45分</option>
+          <option value="60">60分</option>
+        </select>
+      </div>
+      <button class="gen-btn" id="genBtn" onclick="generateProgram()">プログラムを生成する</button>
     </div>
     <div class="gen-result" id="genResult"></div>
   </section>
@@ -287,6 +307,28 @@ const WORKER_URL = "https://movement-science-proxy.koshiro-katsura.workers.dev";
 
 let allExercises = [];
 let currentDetail = null;
+
+const FAV_KEY = "movementScienceFavorites";
+function getFavorites(){
+  try{
+    return JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
+  }catch(e){ return []; }
+}
+function isFavorite(name){
+  return getFavorites().includes(name);
+}
+function toggleFavorite(name, event){
+  if(event) event.stopPropagation();
+  let favs = getFavorites();
+  if(favs.includes(name)){
+    favs = favs.filter(n => n !== name);
+  }else{
+    favs.push(name);
+  }
+  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+  renderList();
+  if(currentDetail && currentDetail.name_ja === name) renderDetail(currentDetail);
+}
 
 async function fetchExercises(){
   const url = `${SUPABASE_URL}/rest/v1/exercises?select=*`;
@@ -351,14 +393,22 @@ function applyFilters(){
   const layer = document.getElementById("f-layer").value;
   const domain = document.getElementById("f-domain").value;
   const difficulty = document.getElementById("f-difficulty").value;
+  const tagSearch = document.getElementById("f-tags").value.trim().toLowerCase();
   const search = document.getElementById("f-search").value.trim().toLowerCase();
+  const favOnly = document.getElementById("f-fav-only").checked;
+  const favs = favOnly ? getFavorites() : null;
 
   return allExercises.filter(ex => {
+    if(favOnly && !favs.includes(ex.name_ja)) return false;
     if(layer && !splitMultiValue(ex.layer).includes(layer)) return false;
     if(domain && !splitMultiValue(ex.domain).includes(domain)) return false;
     if(difficulty && String(ex.difficulty) !== String(difficulty)) return false;
+    if(tagSearch){
+      const tagHay = String(ex.tags || "").toLowerCase();
+      if(!tagHay.includes(tagSearch)) return false;
+    }
     if(search){
-      const hay = `${ex.name_ja||""} ${ex.name_en||""} ${ex.name_custom||""}`.toLowerCase();
+      const hay = `${ex.name_ja||""} ${ex.name_en||""} ${ex.name_custom||""} ${ex.overview||""}`.toLowerCase();
       if(!hay.includes(search)) return false;
     }
     return true;
@@ -400,6 +450,7 @@ function renderList(){
   listEl.innerHTML = filtered.map(ex => {
     const lc = layerColorPair(ex.layer);
     const dc = domainColorPair(ex.domain);
+    const fav = isFavorite(ex.name_ja);
     return `
     <div class="ex-card" onclick="openDetailByName('${escapeAttr(ex.name_ja)}')">
       <div>
@@ -410,7 +461,8 @@ function renderList(){
           ${ex.domain ? `<span class="badge" style="background:${dc[0]};color:${dc[1]};border-color:transparent;font-weight:600;">${escapeHtml(String(ex.domain).split(",")[0].trim())}</span>` : ""}
         </div>
       </div>
-      <div class="meta">
+      <div class="meta" style="align-items:center;">
+        <span onclick="toggleFavorite('${escapeAttr(ex.name_ja)}', event)" style="cursor:pointer;font-size:20px;color:${fav ? "#b08d3f" : "#d8d2c2"};line-height:1;">${fav ? "★" : "☆"}</span>
         ${ex.difficulty ? `<span class="badge diff">${difficultyStars(ex.difficulty)}</span>` : ""}
       </div>
     </div>
@@ -539,7 +591,10 @@ function renderDetail(ex){
 
   document.getElementById("detailBody").innerHTML = `
     <div class="detail-head">
-      <h2>${escapeHtml(ex.name_ja || ex.name_custom)}</h2>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <h2 style="margin:0;">${escapeHtml(ex.name_ja || ex.name_custom)}</h2>
+        <span onclick="toggleFavorite('${escapeAttr(ex.name_ja)}', event)" style="cursor:pointer;font-size:28px;color:${isFavorite(ex.name_ja) ? "#b08d3f" : "#d8d2c2"};line-height:1;flex-shrink:0;">${isFavorite(ex.name_ja) ? "★" : "☆"}</span>
+      </div>
       ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
       <div class="tags">
         ${ex.layer ? `<span class="tag-chip" style="background:${layerColorPair(ex.layer)[0]};color:${layerColorPair(ex.layer)[1]};font-weight:600;">${escapeHtml(layerLabels(ex.layer))}</span>` : ""}
@@ -634,6 +689,8 @@ async function generateProgram(){
   const condition = document.getElementById("g-condition").value.trim();
   const level = document.getElementById("g-level").value;
   const domain = document.getElementById("g-domain").value;
+  const age = document.getElementById("g-age").value.trim();
+  const duration = document.getElementById("g-duration").value;
   const resultEl = document.getElementById("genResult");
   const btn = document.getElementById("genBtn");
 
@@ -645,13 +702,16 @@ async function generateProgram(){
   btn.disabled = true;
   resultEl.innerHTML = `<div class="loading">生成中です…</div>`;
 
+  const durationToCount = { "10": 3, "20": 5, "30": 6, "45": 8, "60": 10 };
+  const itemCount = durationToCount[duration] || 5;
+
   // 候補種目リストを簡潔な形でプロンプトに渡す
   const candidateList = allExercises
     .filter(ex => (!domain || splitMultiValue(ex.domain).includes(domain)))
     .map(ex => `・${ex.name_ja}｜領域:${ex.layer||"-"}｜レイヤー:${ex.domain||"-"}｜難易度:${ex.difficulty||"-"}`)
     .join("\n");
 
-  const prompt = `あなたは運動科学と身体教育の専門家です。以下の条件に基づき、まず推奨されるスクリーニング・評価を提示し、次に下記の候補リストの中から3〜5種目を選び、選定理由と実施順序を日本語で簡潔に提案してください。候補リストにない種目は提案しないでください。
+  const prompt = `あなたは運動科学と身体教育の専門家です。以下の条件に基づき、まず推奨されるスクリーニング・評価を提示し、次に下記の候補リストの中から${itemCount}種目を選び、選定理由と実施順序を日本語で提案してください。候補リストにない種目は提案しないでください。
 
 【目的】
 ${purpose}
@@ -659,19 +719,25 @@ ${purpose}
 【身体状態・注意点】
 ${condition || "特になし"}
 
+【年齢】
+${age || "指定なし"}
+
 【希望レベル】
 ${level || "指定なし"}
 
 【希望レイヤー】
 ${domain || "指定なし"}
 
+【所要時間】
+${duration ? duration + "分" : "指定なし"}
+
 【候補リスト】
 ${candidateList}
 
 出力形式：
 1. まず、目的に応じた推奨スクリーニング・評価を2〜3個、「◆評価名」の形式で明記し、①何を評価するためのものか②その結果から何がわかるかを1〜2文で添えてください。可動域テスト・姿勢観察・動作観察・呼吸パターン評価など、一般的な運動学・評価学の用語で表現し、特定の団体・企業の固有名称やブランド名は使用しないでください。
-2. 次に、候補リストの中から3〜5種目を選び「・種目名」の形式で明記し、選定理由を1〜2文で添えてください。
-3. 最後に実施順序と全体の狙いを短くまとめてください。`;
+2. 次に、候補リストの中から${itemCount}種目を選び「・種目名」の形式で明記し、選定理由を1〜2文で添えてください。年齢が指定されている場合は年代に応じた負荷・注意点も考慮してください。
+3. 最後に、実施順序と全体の狙いを、なぜこの組み合わせ・順序が目的の達成に有効なのか、関連する生理学的・運動学的な理由を含めて詳しく説明してください。単なる手順の要約ではなく、種目間のつながり（例：前段の種目がどう後段の種目の土台になるか）にも触れてください。`;
 
   try{
     const res = await fetch(`${WORKER_URL}?target=gemini`, {
@@ -755,7 +821,7 @@ async function init(){
     document.getElementById("exList").innerHTML = `<div class="error-box" style="margin:0;">データの取得に失敗しました：${escapeHtml(err.message)}</div>`;
   }
 
-  ["f-layer","f-domain","f-difficulty","f-search"].forEach(id => {
+  ["f-layer","f-domain","f-difficulty","f-tags","f-search","f-fav-only"].forEach(id => {
     document.getElementById(id).addEventListener("input", renderList);
   });
 }
