@@ -221,8 +221,8 @@
   <!-- 一覧画面 -->
   <section class="screen active" id="screen-list">
     <div class="filters">
-      <select id="f-layer"><option value="">レイヤー：すべて</option></select>
-      <select id="f-domain"><option value="">領域：すべて</option></select>
+      <select id="f-layer"><option value="">領域：すべて</option></select>
+      <select id="f-domain"><option value="">レイヤー：すべて</option></select>
       <select id="f-difficulty"><option value="">難易度：すべて</option></select>
     </div>
     <input type="search" id="f-search" placeholder="種目名で検索">
@@ -255,7 +255,7 @@
         </select>
       </div>
       <div class="field">
-        <label>領域</label>
+        <label>レイヤー</label>
         <select id="g-domain">
           <option value="">指定なし</option>
         </select>
@@ -322,8 +322,8 @@ function populateFilters(){
   const domains = uniqueSplitValues(allExercises, "domain");
   const difficulties = uniqueValues(allExercises, "difficulty");
 
-  fillSelect("f-layer", layers, "レイヤー：すべて", false, layerLabel);
-  fillSelect("f-domain", domains, "領域：すべて");
+  fillSelect("f-layer", layers, "領域：すべて", false, layerLabel);
+  fillSelect("f-domain", domains, "レイヤー：すべて");
   fillSelect("f-difficulty", difficulties, "難易度：すべて", true);
   fillSelect("g-level", difficulties, "指定なし", true);
   fillSelect("g-domain", domains, "指定なし");
@@ -382,12 +382,12 @@ function renderList(){
   const domainVal = document.getElementById("f-domain").value;
   let infoHtml = "";
   if(layerVal && LAYER_INFO[layerVal]){
-    infoHtml += `<div class="filter-info"><div class="fi-label">レイヤー</div><div class="fi-title">${escapeHtml(LAYER_INFO[layerVal].title)}</div><div class="fi-content">内容：${escapeHtml(LAYER_INFO[layerVal].content)}</div></div>`;
+    infoHtml += `<div class="filter-info"><div class="fi-label">領域</div><div class="fi-title">${escapeHtml(LAYER_INFO[layerVal].title)}</div><div class="fi-content">内容：${escapeHtml(LAYER_INFO[layerVal].content)}</div></div>`;
   }
   if(domainVal){
     const idx = domainMatchIndex(domainVal);
     if(idx !== -1){
-      infoHtml += `<div class="filter-info"><div class="fi-label">領域</div><div class="fi-title">${escapeHtml(domainVal)}</div><div class="fi-content">内容：${escapeHtml(DOMAIN_CONTENT[idx])}</div></div>`;
+      infoHtml += `<div class="filter-info"><div class="fi-label">レイヤー</div><div class="fi-title">${escapeHtml(domainVal)}</div><div class="fi-content">内容：${escapeHtml(DOMAIN_CONTENT[idx])}</div></div>`;
     }
   }
   infoEl.innerHTML = infoHtml;
@@ -648,7 +648,7 @@ async function generateProgram(){
   // 候補種目リストを簡潔な形でプロンプトに渡す
   const candidateList = allExercises
     .filter(ex => (!domain || splitMultiValue(ex.domain).includes(domain)))
-    .map(ex => `・${ex.name_ja}｜レイヤー:${ex.layer||"-"}｜領域:${ex.domain||"-"}｜難易度:${ex.difficulty||"-"}`)
+    .map(ex => `・${ex.name_ja}｜領域:${ex.layer||"-"}｜レイヤー:${ex.domain||"-"}｜難易度:${ex.difficulty||"-"}`)
     .join("\n");
 
   const prompt = `あなたは運動科学と身体教育の専門家です。以下の条件に基づき、まず推奨されるスクリーニング・評価を提示し、次に下記の候補リストの中から3〜5種目を選び、選定理由と実施順序を日本語で簡潔に提案してください。候補リストにない種目は提案しないでください。
@@ -662,7 +662,7 @@ ${condition || "特になし"}
 【希望レベル】
 ${level || "指定なし"}
 
-【希望領域】
+【希望レイヤー】
 ${domain || "指定なし"}
 
 【候補リスト】
