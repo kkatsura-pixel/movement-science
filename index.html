@@ -64,10 +64,13 @@
     background:#fff;border:1px solid var(--line);border-radius:8px;
     padding:9px 10px;font-size:13px;color:var(--ink);font-family:var(--sans);
   }
-  input[type=text], input[type=search]{
+  input[type=text], input[type=search], input[type=number]{
     width:100%;border:1px solid var(--line);border-radius:8px;
     padding:10px 12px;font-size:14px;background:#fff;color:var(--ink);font-family:var(--sans);
-    margin-bottom:10px;
+    margin-bottom:10px;box-sizing:border-box;-webkit-appearance:none;appearance:none;
+  }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0;
   }
 
   .count-row{font-size:12px;color:#767267;margin-bottom:10px;}
@@ -227,7 +230,8 @@
       <select id="f-difficulty"><option value="">難易度：すべて</option></select>
     </div>
     <input type="search" id="f-tags" placeholder="効果で検索（例：脊柱可動性改善）">
-    <input type="search" id="f-search" placeholder="目的で検索（種目名・概要から検索）">
+    <input type="search" id="f-purpose" placeholder="目的で検索（概要から検索）">
+    <input type="search" id="f-search" placeholder="種目名で検索">
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#5c574c;margin-bottom:10px;">
       <input type="checkbox" id="f-fav-only" style="width:auto;margin:0;"> お気に入りのみ表示
     </label>
@@ -394,7 +398,8 @@ function applyFilters(){
   const domain = document.getElementById("f-domain").value;
   const difficulty = document.getElementById("f-difficulty").value;
   const tagSearch = document.getElementById("f-tags").value.trim().toLowerCase();
-  const search = document.getElementById("f-search").value.trim().toLowerCase();
+  const purposeSearch = document.getElementById("f-purpose").value.trim().toLowerCase();
+  const nameSearch = document.getElementById("f-search").value.trim().toLowerCase();
   const favOnly = document.getElementById("f-fav-only").checked;
   const favs = favOnly ? getFavorites() : null;
 
@@ -407,9 +412,13 @@ function applyFilters(){
       const tagHay = String(ex.tags || "").toLowerCase();
       if(!tagHay.includes(tagSearch)) return false;
     }
-    if(search){
-      const hay = `${ex.name_ja||""} ${ex.name_en||""} ${ex.name_custom||""} ${ex.overview||""}`.toLowerCase();
-      if(!hay.includes(search)) return false;
+    if(purposeSearch){
+      const purposeHay = String(ex.overview || "").toLowerCase();
+      if(!purposeHay.includes(purposeSearch)) return false;
+    }
+    if(nameSearch){
+      const nameHay = `${ex.name_ja||""} ${ex.name_en||""} ${ex.name_custom||""}`.toLowerCase();
+      if(!nameHay.includes(nameSearch)) return false;
     }
     return true;
   }).sort((a, b) => {
@@ -821,7 +830,7 @@ async function init(){
     document.getElementById("exList").innerHTML = `<div class="error-box" style="margin:0;">データの取得に失敗しました：${escapeHtml(err.message)}</div>`;
   }
 
-  ["f-layer","f-domain","f-difficulty","f-tags","f-search","f-fav-only"].forEach(id => {
+  ["f-layer","f-domain","f-difficulty","f-tags","f-purpose","f-search","f-fav-only"].forEach(id => {
     document.getElementById(id).addEventListener("input", renderList);
   });
 }
