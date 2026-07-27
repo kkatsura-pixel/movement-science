@@ -166,16 +166,27 @@
   .gen-btn:disabled{background:#b7bfae;}
   .gen-result{margin-top:24px;}
   .gen-para{font-size:14px;line-height:1.8;color:#4a463c;margin:0 0 20px;}
-  .gen-item{
-    display:flex;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;
-    padding:18px 18px;margin-bottom:14px;
+
+  .gen-timeline{position:relative;}
+  .gen-tl-item{position:relative;padding-left:40px;margin-bottom:18px;}
+  .gen-tl-item::before{
+    content:"";position:absolute;left:14px;top:34px;bottom:-18px;width:2px;background:var(--line);
   }
-  .gen-item-num{
-    flex-shrink:0;font-family:var(--serif-en);font-size:19px;color:var(--gold);font-weight:600;
-    line-height:1.6;min-width:22px;
+  .gen-tl-item:last-child::before{display:none;}
+  .gen-tl-badge{
+    position:absolute;left:0;top:0;width:29px;height:29px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;
   }
+  .gen-tl-badge.eval{background:var(--clay);font-size:14px;}
+  .gen-tl-badge.item{background:var(--moss);font-family:var(--serif-en);font-size:14px;}
+  .gen-tl-body{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 17px;}
+  .gen-tl-item.eval .gen-tl-body{background:var(--clay-dim);border-color:transparent;}
+
+  .gen-item-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .gen-item-tags .badge{font-size:10px;padding:3px 8px;border-radius:20px;border:none;}
   .gen-item-body{font-size:14px;line-height:1.8;color:#4a463c;}
   .gen-exname{color:var(--moss);font-weight:700;font-size:16px;display:block;margin-bottom:6px;}
+  .gen-eval-name{color:#8a3524;font-weight:700;font-size:14.5px;display:block;margin-bottom:4px;}
   .gen-summary{
     margin-top:22px;padding-top:18px;border-top:2px solid var(--gold);
     font-size:13.5px;line-height:1.85;color:#4a463c;
@@ -626,7 +637,7 @@ async function generateProgram(){
     .map(ex => `・${ex.name_ja}｜レイヤー:${ex.layer||"-"}｜領域:${ex.domain||"-"}｜難易度:${ex.difficulty||"-"}`)
     .join("\n");
 
-  const prompt = `あなたは運動科学と身体教育の専門家です。以下の条件に基づき、下記の候補リストの中から3〜5種目を選び、選定理由と実施順序を日本語で簡潔に提案してください。候補リストにない種目は提案しないでください。
+  const prompt = `あなたは運動科学と身体教育の専門家です。以下の条件に基づき、まず推奨されるスクリーニング・評価を提示し、次に下記の候補リストの中から3〜5種目を選び、選定理由と実施順序を日本語で簡潔に提案してください。候補リストにない種目は提案しないでください。
 
 【目的】
 ${purpose}
@@ -644,8 +655,9 @@ ${domain || "指定なし"}
 ${candidateList}
 
 出力形式：
-1. 各種目名を「・種目名」の形式で明記し、選定理由を1〜2文で添えてください。
-2. 最後に実施順序と全体の狙いを短くまとめてください。`;
+1. まず、目的に応じた推奨スクリーニング・評価を2〜3個、「◆評価名」の形式で明記し、①何を評価するためのものか②その結果から何がわかるかを1〜2文で添えてください。可動域テスト・姿勢観察・動作観察・呼吸パターン評価など、一般的な運動学・評価学の用語で表現し、特定の団体・企業の固有名称やブランド名は使用しないでください。
+2. 次に、候補リストの中から3〜5種目を選び「・種目名」の形式で明記し、選定理由を1〜2文で添えてください。
+3. 最後に実施順序と全体の狙いを短くまとめてください。`;
 
   try{
     const res = await fetch(`${WORKER_URL}?target=gemini`, {
@@ -663,22 +675,52 @@ ${candidateList}
     const text = data.text || data.result || data.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
     const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
 
-    const boldify = s => s.replace(/\*\*(.+?)\*\*/g, '<span class="gen-exname">$1</span>');
+    const boldify = (s, cls) => s.replace(/\*\*(.+?)\*\*/g, `<span class="${cls}">$1</span>`);
     const paragraphs = escapeHtml(text).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
 
-    let bulletIndex = 0;
+    let evalIndex = 0;
+    let itemIndex = 0;
     let sawItem = false;
-    const html = paragraphs.map(p => {
-      if(/^・/.test(p)){
-        sawItem = true;
-        const num = circled[bulletIndex] || `${bulletIndex + 1}.`;
-        bulletIndex++;
-        const body = boldify(p.replace(/^・\s*/, ""));
-        return `<div class="gen-item"><div class="gen-item-num">${num}</div><div class="gen-item-body">${body}</div></div>`;
+    let inTimeline = false;
+    let html = "";
+
+    paragraphs.forEach(p => {
+      if(/^◆/.test(p)){
+        if(!inTimeline){ html += `<div class="gen-timeline">`; inTimeline = true; }
+        evalIndex++;
+        const body = boldify(p.replace(/^◆\s*/, ""), "gen-eval-name");
+        html += `<div class="gen-tl-item eval"><div class="gen-tl-badge eval">評</div><div class="gen-tl-body">${body}</div></div>`;
+        return;
       }
+      if(/^・/.test(p)){
+        if(!inTimeline){ html += `<div class="gen-timeline">`; inTimeline = true; }
+        sawItem = true;
+        itemIndex++;
+        const num = circled[itemIndex - 1] || `${itemIndex}`;
+        let raw = p.replace(/^・\s*/, "");
+        const nameMatch = raw.match(/\*\*(.+?)\*\*/);
+        const rawName = nameMatch ? nameMatch[1] : null;
+        const matched = rawName ? allExercises.find(e => e.name_ja === rawName) : null;
+        const body = boldify(raw, "gen-exname");
+        let tagsHtml = "";
+        let clickAttr = "";
+        if(matched){
+          const lc = layerColorPair(matched.layer);
+          const dc = domainColorPair(matched.domain);
+          tagsHtml = `<div class="gen-item-tags">
+            <span class="badge" style="background:${lc[0]};color:${lc[1]};">${escapeHtml(layerLabels(matched.layer))}</span>
+            <span class="badge" style="background:${dc[0]};color:${dc[1]};">${escapeHtml(String(matched.domain).split(",")[0].trim())}</span>
+          </div>`;
+          clickAttr = ` onclick="openDetailByName('${escapeAttr(matched.name_ja)}')" style="cursor:pointer;"`;
+        }
+        html += `<div class="gen-tl-item item"${clickAttr}><div class="gen-tl-badge item">${num}</div><div class="gen-tl-body"><div class="gen-item-body">${body}</div>${tagsHtml}</div></div>`;
+        return;
+      }
+      if(inTimeline){ html += `</div>`; inTimeline = false; }
       const cls = sawItem ? "gen-summary" : "gen-para";
-      return `<div class="${cls}">${boldify(p)}</div>`;
-    }).join("");
+      html += `<div class="${cls}">${boldify(p, "gen-exname")}</div>`;
+    });
+    if(inTimeline) html += `</div>`;
 
     resultEl.innerHTML = html;
   }catch(err){
