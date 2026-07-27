@@ -413,7 +413,7 @@ function applyFilters(){
       if(!tagHay.includes(tagSearch)) return false;
     }
     if(purposeSearch){
-      const purposeHay = String(ex.overview || "").toLowerCase();
+      const purposeHay = `${ex.overview||""} ${ex.confirmation||""} ${ex.precautions||""} ${ex.tags||""} ${ex.error_patterns||""} ${ex.indications||""}`.toLowerCase();
       if(!purposeHay.includes(purposeSearch)) return false;
     }
     if(nameSearch){
@@ -583,6 +583,7 @@ function renderDetail(ex){
 
   const sections = [
     ["概要", ex.overview],
+    ["主訴・適応症状", ex.indications],
     ["解剖学", ex.anatomy],
     ["機能解剖学", ex.functional_anatomy],
     ["神経科学的視点", ex.neuroscience],
@@ -785,7 +786,7 @@ ${candidateList}
         if(!inTimeline){ html += `<div class="gen-timeline">`; inTimeline = true; }
         sawItem = true;
         itemIndex++;
-        const num = circled[itemIndex - 1] || `${itemIndex}`;
+        const num = itemIndex;
         let raw = p.replace(/^・\s*/, "");
         const nameMatch = raw.match(/\*\*(.+?)\*\*/);
         const rawName = nameMatch ? nameMatch[1] : null;
