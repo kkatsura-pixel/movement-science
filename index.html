@@ -523,7 +523,10 @@ function renderList(){
     return `
     <div class="ex-card" onclick="openDetailByName('${escapeAttr(ex.name_ja)}')">
       <div>
-        <div class="name-ja">${escapeHtml(ex.name_ja || ex.name_custom || "(名称未設定)")}</div>
+        <div class="name-ja" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span>${escapeHtml(ex.name_ja || ex.name_custom || "(名称未設定)")}</span>
+          ${ex.difficulty ? `<span class="badge diff" style="font-size:9px;">${difficultyStars(ex.difficulty)}</span>` : ""}
+        </div>
         ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
         <div class="meta" style="margin-top:6px;">
           ${ex.layer ? `<span class="badge" style="background:${lc[0]};color:${lc[1]};border-color:transparent;font-weight:600;">${escapeHtml(layerLabels(ex.layer))}</span>` : ""}
@@ -532,7 +535,6 @@ function renderList(){
       </div>
       <div class="meta" style="align-items:center;">
         <span onclick="toggleFavorite('${escapeAttr(ex.name_ja)}', event)" style="cursor:pointer;font-size:20px;color:${fav ? "#b08d3f" : "#d8d2c2"};line-height:1;">${fav ? "★" : "☆"}</span>
-        ${ex.difficulty ? `<span class="badge diff">${difficultyStars(ex.difficulty)}</span>` : ""}
       </div>
     </div>
   `;
@@ -765,14 +767,15 @@ function linkifyExerciseNames(text){
 
 function renderBranchCards(items){
   if(!items.length) return `<div class="empty-state" style="padding:16px;">登録なし</div>`;
+  const starify = html => html.split("⭐️").join(STAR_SVG);
   return items.map(t => {
     const idx = t.indexOf("→");
     if(idx > -1){
       const label = t.slice(0, idx + 1);
       const rest = t.slice(idx + 1);
-      return `<div class="branch-card"><span class="branch-label">${escapeHtml(label)}</span>${linkifyExerciseNames(rest)}</div>`;
+      return `<div class="branch-card"><span class="branch-label">${starify(escapeHtml(label))}</span>${starify(linkifyExerciseNames(rest))}</div>`;
     }
-    return `<div class="branch-card">${linkifyExerciseNames(t)}</div>`;
+    return `<div class="branch-card">${starify(linkifyExerciseNames(t))}</div>`;
   }).join("");
 }
 
