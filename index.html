@@ -769,7 +769,7 @@ function renderBranchCards(items){
   if(!items.length) return `<div class="empty-state" style="padding:16px;">登録なし</div>`;
   const starify = html => html.split("⭐️").join(`<span style="color:#854F0B;">${STAR_SVG}</span>`);
   return items.map(t => {
-    const starMatch = t.match(/^(⭐️+)\s*([^（(]+?)[（(]([^）)]+)[）)]([\s\S]*)$/);
+    const starMatch = t.match(/^((?:⭐️)+)\s*([^（(]+?)[（(]([^）)]+)[）)]([\s\S]*)$/);
     if(starMatch){
       const stars = starMatch[1];
       const name = starMatch[2].trim();
