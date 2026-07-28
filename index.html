@@ -769,6 +769,13 @@ function renderBranchCards(items){
   if(!items.length) return `<div class="empty-state" style="padding:16px;">登録なし</div>`;
   const starify = html => html.split("⭐️").join(STAR_SVG);
   return items.map(t => {
+    const starMatch = t.match(/^(⭐️+)\s*([^（(]+?)[（(]([^）)]+)[）)]\s*$/);
+    if(starMatch){
+      const stars = starMatch[1];
+      const name = starMatch[2].trim();
+      const desc = starMatch[3].trim();
+      return `<div class="branch-card"><span class="branch-label">${escapeHtml(desc)}</span>${starify(escapeHtml(stars))} ${linkifyExerciseNames(name)}</div>`;
+    }
     const idx = t.indexOf("→");
     if(idx > -1){
       const label = t.slice(0, idx + 1);
