@@ -767,7 +767,7 @@ function linkifyExerciseNames(text){
 
 function renderBranchCards(items){
   if(!items.length) return `<div class="empty-state" style="padding:16px;">登録なし</div>`;
-  const starify = html => html.split("⭐️").join(STAR_SVG);
+  const starify = html => html.split("⭐️").join(`<span style="color:#854F0B;">${STAR_SVG}</span>`);
   return items.map(t => {
     const starMatch = t.match(/^(⭐️+)\s*([^（(]+?)[（(]([^）)]+)[）)]\s*$/);
     if(starMatch){
