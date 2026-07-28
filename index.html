@@ -162,6 +162,7 @@
     padding:13px 15px;font-size:13.5px;line-height:1.75;color:#33362f;margin-bottom:10px;
   }
   .branch-link{color:var(--moss);font-weight:700;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:2px;}
+  .branch-label{font-weight:700;color:var(--ink);display:block;margin-bottom:5px;font-family:var(--serif);font-size:14px;}
 
   /* Generator */
   .gform{display:flex;flex-direction:column;gap:12px;}
@@ -302,13 +303,13 @@
     <div class="section" style="margin-top:0;">
       <div class="label">領域</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
-        <div style="background:#E6F1FB;color:#0C447C;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>発達運動学</strong>（Developmental Kinesiology）</div>
-        <div style="background:#B5D4F4;color:#0C447C;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>神経科学的基盤</strong>（Neuroscience / Sensorimotor Science）</div>
-        <div style="background:#85B7EB;color:#042C53;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>呼吸・姿勢制御学</strong>（Respiratory & Postural Control）</div>
-        <div style="background:#378ADD;color:#042C53;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>運動制御学</strong>（Motor Control）</div>
-        <div style="background:#185FA5;color:#E6F1FB;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>機能的動作学</strong>（Functional Movement Science）</div>
-        <div style="background:#0C447C;color:#E6F1FB;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>筋力・コンディショニング学</strong>（Strength & Conditioning）</div>
-        <div style="background:#042C53;color:#B5D4F4;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>スポーツ科学</strong>（Sports Performance Science）</div>
+        <div onclick="goToFilteredList('f-layer','Layer 0')" style="cursor:pointer;background:#E6F1FB;color:#0C447C;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>発達運動学</strong>（Developmental Kinesiology）</div>
+        <div onclick="goToFilteredList('f-layer','Layer 1')" style="cursor:pointer;background:#B5D4F4;color:#0C447C;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>神経科学的基盤</strong>（Neuroscience / Sensorimotor Science）</div>
+        <div onclick="goToFilteredList('f-layer','Layer 2')" style="cursor:pointer;background:#85B7EB;color:#042C53;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>呼吸・姿勢制御学</strong>（Respiratory & Postural Control）</div>
+        <div onclick="goToFilteredList('f-layer','Layer 3')" style="cursor:pointer;background:#378ADD;color:#042C53;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>運動制御学</strong>（Motor Control）</div>
+        <div onclick="goToFilteredList('f-layer','Layer 4')" style="cursor:pointer;background:#185FA5;color:#E6F1FB;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>機能的動作学</strong>（Functional Movement Science）</div>
+        <div onclick="goToFilteredList('f-layer','Layer 5')" style="cursor:pointer;background:#0C447C;color:#E6F1FB;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>筋力・コンディショニング学</strong>（Strength & Conditioning）</div>
+        <div onclick="goToFilteredList('f-layer','Layer 6')" style="cursor:pointer;background:#042C53;color:#B5D4F4;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>スポーツ科学</strong>（Sports Performance Science）</div>
       </div>
     </div>
     <div class="section">
@@ -334,10 +335,10 @@
         <line x1="60" y1="90" x2="60" y2="106" stroke="var(--line)" stroke-width="2"/>
         <line x1="170" y1="90" x2="170" y2="106" stroke="var(--line)" stroke-width="2"/>
         <line x1="280" y1="90" x2="280" y2="106" stroke="var(--line)" stroke-width="2"/>
-        <rect x="10" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
-        <text x="60" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">プログレッション</text>
-        <rect x="120" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
-        <text x="170" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">エラー別修正</text>
+        <rect x="10" y="106" width="100" height="26" rx="6" fill="#E6F1FB" stroke="none"/>
+        <text x="60" y="123" text-anchor="middle" fill="#0C447C" font-size="10" font-family="sans-serif">プログレッション</text>
+        <rect x="120" y="106" width="100" height="26" rx="6" fill="#FAEEDA" stroke="none"/>
+        <text x="170" y="123" text-anchor="middle" fill="#854F0B" font-size="10" font-family="sans-serif">エラー別修正</text>
         <rect x="230" y="106" width="100" height="40" rx="6" fill="#FCEBEB" stroke="none"/>
         <text x="280" y="120" text-anchor="middle" fill="#A32D2D" font-size="10" font-family="sans-serif">リグレッション</text>
         <text x="280" y="136" text-anchor="middle" fill="#A32D2D" font-size="9" font-family="sans-serif">（理由別A〜E）</text>
@@ -654,8 +655,8 @@ function renderDetail(ex){
 
   const branchTabs = [
     {key:"progressions", label:"プログレッション", data: progressions},
-    {key:"regressions", label:"リグレッション", data: regressions},
     {key:"errors", label:"エラー別修正", data: errorCorrections},
+    {key:"regressions", label:"リグレッション", data: regressions},
   ];
 
   document.getElementById("detailBody").innerHTML = `
@@ -702,7 +703,7 @@ function renderDetail(ex){
 
     <div class="section">
       <div class="label">分岐 / Decision Tree</div>
-      <svg viewBox="0 0 340 200" style="width:100%;max-width:400px;display:block;margin:0 auto 14px;">
+      <svg viewBox="0 0 340 156" style="width:100%;max-width:400px;display:block;margin:0 auto 4px;">
         <rect x="120" y="4" width="100" height="28" rx="14" fill="var(--ink)"/>
         <text x="170" y="22" text-anchor="middle" fill="var(--paper)" font-size="11" font-family="sans-serif">実施する</text>
         <line x1="170" y1="32" x2="170" y2="48" stroke="var(--line)" stroke-width="2"/>
@@ -719,10 +720,10 @@ function renderDetail(ex){
         <line x1="60" y1="90" x2="60" y2="106" stroke="var(--line)" stroke-width="2"/>
         <line x1="170" y1="90" x2="170" y2="106" stroke="var(--line)" stroke-width="2"/>
         <line x1="280" y1="90" x2="280" y2="106" stroke="var(--line)" stroke-width="2"/>
-        <rect x="10" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
-        <text x="60" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">プログレッション</text>
-        <rect x="120" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
-        <text x="170" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">エラー別修正</text>
+        <rect x="10" y="106" width="100" height="26" rx="6" fill="#E6F1FB" stroke="none"/>
+        <text x="60" y="123" text-anchor="middle" fill="#0C447C" font-size="10" font-family="sans-serif">プログレッション</text>
+        <rect x="120" y="106" width="100" height="26" rx="6" fill="#FAEEDA" stroke="none"/>
+        <text x="170" y="123" text-anchor="middle" fill="#854F0B" font-size="10" font-family="sans-serif">エラー別修正</text>
         <rect x="230" y="106" width="100" height="40" rx="6" fill="#FCEBEB" stroke="none"/>
         <text x="280" y="120" text-anchor="middle" fill="#A32D2D" font-size="10" font-family="sans-serif">リグレッション</text>
         <text x="280" y="136" text-anchor="middle" fill="#A32D2D" font-size="9" font-family="sans-serif">（理由別A〜E）</text>
@@ -764,7 +765,15 @@ function linkifyExerciseNames(text){
 
 function renderBranchCards(items){
   if(!items.length) return `<div class="empty-state" style="padding:16px;">登録なし</div>`;
-  return items.map(t => `<div class="branch-card">${linkifyExerciseNames(t)}</div>`).join("");
+  return items.map(t => {
+    const idx = t.indexOf("→");
+    if(idx > -1){
+      const label = t.slice(0, idx + 1);
+      const rest = t.slice(idx + 1);
+      return `<div class="branch-card"><span class="branch-label">${escapeHtml(label)}</span>${linkifyExerciseNames(rest)}</div>`;
+    }
+    return `<div class="branch-card">${linkifyExerciseNames(t)}</div>`;
+  }).join("");
 }
 
 function renderRelatedChips(rawEntries){
@@ -823,13 +832,20 @@ function switchTab(name, fromCardClick){
     const el = document.getElementById("guideDomainList");
     if(el && !el.dataset.rendered){
       el.innerHTML = DOMAIN_ORDER.map((d, i) => `
-        <div style="background:${DOMAIN_COLORS[i]};color:${DOMAIN_TEXT[i]};padding:12px 14px;border-radius:10px;font-size:13px;">
+        <div onclick="goToFilteredList('f-domain','${escapeAttr(d)}')" style="cursor:pointer;background:${DOMAIN_COLORS[i]};color:${DOMAIN_TEXT[i]};padding:12px 14px;border-radius:10px;font-size:13px;">
           <strong>${escapeHtml(d)}</strong>
         </div>
       `).join("");
       el.dataset.rendered = "1";
     }
   }
+}
+
+function goToFilteredList(selectId, value){
+  const el = document.getElementById(selectId);
+  if(el) el.value = value;
+  switchTab("list");
+  renderList();
 }
 
 /* ============ プログラムジェネレーター（Gemini API / Cloudflare Worker経由） ============ */
