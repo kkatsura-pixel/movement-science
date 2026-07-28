@@ -118,7 +118,7 @@
   .tag-chip.tag-layer{background:#e2e9f0;color:#3d5a80;}
   .tag-chip.tag-domain{background:#f1e6d0;color:#8a6d1f;}
   .tag-chip.tag-difficulty{background:#FAEEDA;color:#854F0B;font-weight:600;}
-  .tag-chip.tag-effect{background:#e4ece0;color:var(--moss);}
+  .tag-chip.tag-effect{background:#DCEBD5;color:#3D6B2C;font-weight:600;}
 
   .warn-box{
     margin-top:20px;background:var(--clay-dim);border-left:3px solid var(--clay);
@@ -154,6 +154,8 @@
   }
   .chip-link:active{background:var(--paper-dim);}
   .chip-link .arrow{color:var(--moss);}
+  .chip-link.related{background:#EEF2E9;border-color:var(--moss-dim);font-weight:600;}
+  .chip-link.related .arrow{color:var(--moss);font-size:18px;}
 
   /* Generator */
   .gform{display:flex;flex-direction:column;gap:12px;}
@@ -289,6 +291,52 @@
     <div class="gen-result" id="genResult"></div>
   </section>
 
+  <!-- ガイド画面 -->
+  <section class="screen" id="screen-guide">
+    <div class="section" style="margin-top:0;">
+      <div class="label">知識レイヤー構造</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="background:#E6F1FB;color:#0C447C;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>発達運動学</strong>（Developmental Kinesiology）</div>
+        <div style="background:#B5D4F4;color:#0C447C;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>神経科学的基盤</strong>（Neuroscience / Sensorimotor Science）</div>
+        <div style="background:#85B7EB;color:#042C53;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>呼吸・姿勢制御学</strong>（Respiratory & Postural Control）</div>
+        <div style="background:#378ADD;color:#042C53;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>運動制御学</strong>（Motor Control）</div>
+        <div style="background:#185FA5;color:#E6F1FB;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>機能的動作学</strong>（Functional Movement Science）</div>
+        <div style="background:#0C447C;color:#E6F1FB;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>筋力・コンディショニング学</strong>（Strength & Conditioning）</div>
+        <div style="background:#042C53;color:#B5D4F4;padding:12px 14px;border-radius:10px;font-size:13px;"><strong>スポーツ科学</strong>（Sports Performance Science）</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="label">プログレッション・リグレッション分岐ロジック</div>
+      <svg viewBox="0 0 340 170" style="width:100%;max-width:400px;display:block;margin:0 auto;">
+        <rect x="120" y="4" width="100" height="28" rx="14" fill="var(--ink)"/>
+        <text x="170" y="22" text-anchor="middle" fill="var(--paper)" font-size="11" font-family="sans-serif">実施する</text>
+        <line x1="170" y1="32" x2="170" y2="48" stroke="var(--line)" stroke-width="2"/>
+        <line x1="60" y1="48" x2="280" y2="48" stroke="var(--line)" stroke-width="2"/>
+        <line x1="60" y1="48" x2="60" y2="60" stroke="var(--line)" stroke-width="2"/>
+        <line x1="170" y1="48" x2="170" y2="60" stroke="var(--line)" stroke-width="2"/>
+        <line x1="280" y1="48" x2="280" y2="60" stroke="var(--line)" stroke-width="2"/>
+        <rect x="10" y="60" width="100" height="30" rx="8" fill="#E6F1FB"/>
+        <text x="60" y="79" text-anchor="middle" fill="#0C447C" font-size="10" font-family="sans-serif">できる・良好</text>
+        <rect x="120" y="60" width="100" height="30" rx="8" fill="#FAEEDA"/>
+        <text x="170" y="76" text-anchor="middle" fill="#854F0B" font-size="10" font-family="sans-serif">できるが</text>
+        <text x="170" y="88" text-anchor="middle" fill="#854F0B" font-size="10" font-family="sans-serif">エラーあり</text>
+        <rect x="230" y="60" width="100" height="30" rx="8" fill="#FCEBEB"/>
+        <text x="280" y="79" text-anchor="middle" fill="#A32D2D" font-size="10" font-family="sans-serif">できない</text>
+        <line x1="60" y1="90" x2="60" y2="106" stroke="var(--line)" stroke-width="2"/>
+        <line x1="170" y1="90" x2="170" y2="106" stroke="var(--line)" stroke-width="2"/>
+        <line x1="280" y1="90" x2="280" y2="106" stroke="var(--line)" stroke-width="2"/>
+        <rect x="10" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
+        <text x="60" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">プログレッション</text>
+        <rect x="120" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
+        <text x="170" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">エラー別修正</text>
+        <rect x="230" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
+        <text x="280" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">理由別A〜E</text>
+        <line x1="280" y1="132" x2="280" y2="145" stroke="var(--line)" stroke-width="2"/>
+        <text x="280" y="160" text-anchor="middle" fill="var(--moss)" font-size="10" font-family="sans-serif">リグレッション</text>
+      </svg>
+    </div>
+  </section>
+
   <nav class="tabbar">
     <button class="active" id="tab-list" onclick="switchTab('list')">
       <span class="ic"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>一覧
@@ -298,6 +346,9 @@
     </button>
     <button id="tab-generator" onclick="switchTab('generator')">
       <span class="ic"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"/><circle cx="12" cy="12" r="2.3"/></svg></span>生成
+    </button>
+    <button id="tab-guide" onclick="switchTab('guide')">
+      <span class="ic"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></span>ガイド
     </button>
   </nav>
 </div>
@@ -642,7 +693,34 @@ function renderDetail(ex){
       </div>` : ""}
 
     <div class="section">
-      <div class="label">分岐</div>
+      <div class="label">分岐 / Decision Tree</div>
+      <svg viewBox="0 0 340 170" style="width:100%;max-width:400px;display:block;margin:0 auto 14px;">
+        <rect x="120" y="4" width="100" height="28" rx="14" fill="var(--ink)"/>
+        <text x="170" y="22" text-anchor="middle" fill="var(--paper)" font-size="11" font-family="sans-serif">実施する</text>
+        <line x1="170" y1="32" x2="170" y2="48" stroke="var(--line)" stroke-width="2"/>
+        <line x1="60" y1="48" x2="280" y2="48" stroke="var(--line)" stroke-width="2"/>
+        <line x1="60" y1="48" x2="60" y2="60" stroke="var(--line)" stroke-width="2"/>
+        <line x1="170" y1="48" x2="170" y2="60" stroke="var(--line)" stroke-width="2"/>
+        <line x1="280" y1="48" x2="280" y2="60" stroke="var(--line)" stroke-width="2"/>
+        <rect x="10" y="60" width="100" height="30" rx="8" fill="#E6F1FB"/>
+        <text x="60" y="79" text-anchor="middle" fill="#0C447C" font-size="10" font-family="sans-serif">できる・良好</text>
+        <rect x="120" y="60" width="100" height="30" rx="8" fill="#FAEEDA"/>
+        <text x="170" y="76" text-anchor="middle" fill="#854F0B" font-size="10" font-family="sans-serif">できるが</text>
+        <text x="170" y="88" text-anchor="middle" fill="#854F0B" font-size="10" font-family="sans-serif">エラーあり</text>
+        <rect x="230" y="60" width="100" height="30" rx="8" fill="#FCEBEB"/>
+        <text x="280" y="79" text-anchor="middle" fill="#A32D2D" font-size="10" font-family="sans-serif">できない</text>
+        <line x1="60" y1="90" x2="60" y2="106" stroke="var(--line)" stroke-width="2"/>
+        <line x1="170" y1="90" x2="170" y2="106" stroke="var(--line)" stroke-width="2"/>
+        <line x1="280" y1="90" x2="280" y2="106" stroke="var(--line)" stroke-width="2"/>
+        <rect x="10" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
+        <text x="60" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">プログレッション</text>
+        <rect x="120" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
+        <text x="170" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">エラー別修正</text>
+        <rect x="230" y="106" width="100" height="26" rx="6" fill="none" stroke="var(--line)"/>
+        <text x="280" y="123" text-anchor="middle" fill="var(--ink)" font-size="10" font-family="sans-serif">理由別A〜E</text>
+        <line x1="280" y1="132" x2="280" y2="145" stroke="var(--line)" stroke-width="2"/>
+        <text x="280" y="160" text-anchor="middle" fill="var(--moss)" font-size="10" font-family="sans-serif">リグレッション</text>
+      </svg>
       <div class="branch-tabs">
         ${branchTabs.map((b, i) => `
           <div class="branch-tab ${i===0?'active':''}" data-branch="${b.key}" onclick="switchBranch('${b.key}')">${b.label}<br>(${b.data.length})</div>
@@ -655,19 +733,19 @@ function renderDetail(ex){
       `).join("")}
     </div>
 
-    ${related.length ? `
+    ${(related.length || (reverseRelatedMap[ex.name_ja] && reverseRelatedMap[ex.name_ja].size)) ? `
       <div class="section">
-        <div class="label">関連種目</div>
-        <div class="chip-list">${renderChipList(related)}</div>
+        <div class="label">🔗 関連種目（ネットワーク）</div>
+        <div class="chip-list">${renderChipList([...new Set([...related, ...(reverseRelatedMap[ex.name_ja] ? [...reverseRelatedMap[ex.name_ja]] : [])])], 'related')}</div>
       </div>` : ""}
   `;
 }
 
-function renderChipList(names){
+function renderChipList(names, cls){
   if(!names.length) return `<div class="empty-state" style="padding:16px;">登録なし</div>`;
   return `<div class="chip-list">${names.map(n => {
     const exists = allExercises.some(e => e.name_ja === n);
-    return `<div class="chip-link" ${exists ? `onclick="openDetailByName('${escapeAttr(n)}')"` : ""}>
+    return `<div class="chip-link ${cls||''}" ${exists ? `onclick="openDetailByName('${escapeAttr(n)}')"` : ""}>
       <span>${escapeHtml(n)}</span>
       ${exists ? `<span class="arrow">›</span>` : ""}
     </div>`;
@@ -689,7 +767,7 @@ function switchTab(name, fromCardClick){
   document.getElementById(`screen-${name}`).classList.add("active");
   document.getElementById(`tab-${name}`).classList.add("active");
 
-  const titles = { list: "Exercise Library", detail: "Exercise Library", generator: "Program Generator" };
+  const titles = { list: "Exercise Library", detail: "Exercise Library", generator: "Program Generator", guide: "Guide" };
   document.getElementById("headerTitle").textContent = titles[name];
 }
 
@@ -821,10 +899,29 @@ ${candidateList}
 }
 
 /* ============ 初期化 ============ */
+let reverseRelatedMap = {};
+function buildReverseRelatedMap(){
+  reverseRelatedMap = {};
+  allExercises.forEach(ex => {
+    const rel = toArray(ex.related_exercises);
+    rel.forEach(rName => {
+      // 名前部分だけ抽出（"Layer0◯◯"形式や"、"区切りにも対応）
+      const cleaned = rName.replace(/^Layer\s*\d+の?/, "").trim();
+      allExercises.forEach(target => {
+        if(target.name_ja !== ex.name_ja && cleaned.includes(target.name_ja)){
+          if(!reverseRelatedMap[target.name_ja]) reverseRelatedMap[target.name_ja] = new Set();
+          reverseRelatedMap[target.name_ja].add(ex.name_ja);
+        }
+      });
+    });
+  });
+}
+
 async function init(){
   document.getElementById("exList").innerHTML = `<div class="empty-state">読み込み中…</div>`;
   try{
     allExercises = await fetchExercises();
+    buildReverseRelatedMap();
     populateFilters();
     renderList();
   }catch(err){
