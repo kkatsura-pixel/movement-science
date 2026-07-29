@@ -871,6 +871,7 @@ function switchTab(name, fromCardClick){
   document.querySelectorAll("nav.tabbar button").forEach(el => el.classList.remove("active"));
   document.getElementById(`screen-${name}`).classList.add("active");
   document.getElementById(`tab-${name}`).classList.add("active");
+  window.scrollTo(0, 0);
 
   const titles = { list: "Exercise Library", detail: "Exercise Library", generator: "Program Generator", guide: "Guide" };
   document.getElementById("headerTitle").textContent = titles[name];
