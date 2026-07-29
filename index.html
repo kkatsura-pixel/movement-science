@@ -654,7 +654,7 @@ function renderDetail(ex){
     ["キューイング", ex.cueing],
     ["よくあるエラーパターン", ex.error_patterns],
     ["確認事項", ex.confirmation],
-    ["エビデンス", ex.evidence],
+    ["エビデンス＋リファレンス", ex.evidence],
   ].filter(([_, v]) => v);
 
   const branchTabs = [
@@ -679,15 +679,11 @@ function renderDetail(ex){
       ${ex.reps_sets ? `<div style="margin-top:10px;font-size:13px;color:var(--moss);font-weight:700;">📋 推奨：${escapeHtml(ex.reps_sets)}</div>` : ""}
     </div>
 
-    ${ex.contraindications ? `
+    ${(ex.contraindications || ex.contraindication_matrix) ? `
       <div class="warn-box">
         <div class="label">禁忌</div>
-        ${escapeHtml(ex.contraindications)}
-      </div>` : ""}
-    ${ex.contraindication_matrix ? `
-      <div class="warn-box" style="background:#fff;border-left-color:var(--gold);color:var(--ink);">
-        <div class="label" style="color:var(--gold);">禁忌チェック表</div>
-        ${escapeHtml(ex.contraindication_matrix)}
+        ${ex.contraindications ? escapeHtml(ex.contraindications) : ""}
+        ${ex.contraindication_matrix ? `<div style="margin-top:${ex.contraindications ? "10px" : "0"};padding-top:${ex.contraindications ? "10px" : "0"};${ex.contraindications ? "border-top:1px solid rgba(0,0,0,0.08);" : ""}">${escapeHtml(ex.contraindication_matrix)}</div>` : ""}
       </div>` : ""}
     ${ex.precautions ? `
       <div class="warn-box">
@@ -750,11 +746,18 @@ function renderDetail(ex){
       `).join("")}
     </div>
 
-    ${(related.length || (reverseRelatedMap[ex.name_ja] && reverseRelatedMap[ex.name_ja].size)) ? `
-      <div class="section">
-        <div class="label">🔗 関連種目（ネットワーク）</div>
-        <div class="chip-list-wrap">${renderRelatedChips([...related, ...(reverseRelatedMap[ex.name_ja] ? [...reverseRelatedMap[ex.name_ja]] : [])])}</div>
-      </div>` : ""}
+    ${(() => {
+      const allRelated = [...related, ...(reverseRelatedMap[ex.name_ja] ? [...reverseRelatedMap[ex.name_ja]] : [])];
+      const screeningNames = [...new Set(allRelated)].filter(n => {
+        const t = allExercises.find(e => e.name_ja === n);
+        return t && String(t.domain || "").includes("スクリーニング系");
+      });
+      if(!screeningNames.length) return "";
+      return `<div class="section">
+          <div class="label">🩺 推奨スクリーニング</div>
+          <div class="chip-list-wrap">${renderRelatedChips(screeningNames)}</div>
+        </div>`;
+    })()}
   `;
 }
 
