@@ -584,8 +584,9 @@ function layerColorPair(layerStr){
   return LAYER_COLORS[key] || ["#eae6db", "#5c574c"];
 }
 
-const DOMAIN_ORDER = ["リリース・準備系","モビリティ系","神経系再教育系","呼吸・姿勢再統合系","発達パターン系","アクティベーション系","コレクティブ系","ピラティス系","ファンクショナル系","ストレングス系","コンディショニング系","パフォーマンス系"];
+const DOMAIN_ORDER = ["スクリーニング系","リリース・準備系","モビリティ系","神経系再教育系","呼吸・姿勢再統合系","発達パターン系","アクティベーション系","コレクティブ系","ピラティス系","ファンクショナル系","ストレングス系","コンディショニング系","パフォーマンス系"];
 const DOMAIN_CONTENT = [
+  "可動域テスト・姿勢観察・動作観察・呼吸パターン評価等、種目選定前に行う評価・スクリーニング",
   "筋膜・筋の緊張緩和、セルフミオファシャルリリース、静的・動的ストレッチ、神経系のダウンレギュレーション",
   "関節可動域の改善、脊柱・股関節・胸郭の分節的可動性、能動的な可動域拡大",
   "関節神経入力ドリル、視覚系・前庭系トレーニング、感覚統合、原始反射の統合",
@@ -599,8 +600,8 @@ const DOMAIN_CONTENT = [
   "有酸素トレーニング、インターバルトレーニング、代謝系コンディショニング、リカバリー",
   "競技特異的トレーニング、スプリント、アジリティ、パワー開発、ピーキング"
 ];
-const DOMAIN_COLORS = ["#FDF1EC","#FADFCF","#F5C7AE","#EEA987","#E58C68","#DB7050","#C85A3E","#AC482F","#8F3A26","#73301F","#571F14","#3D140D"];
-const DOMAIN_TEXT = ["#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC"];
+const DOMAIN_COLORS = ["#EDE7F6","#FDF1EC","#FADFCF","#F5C7AE","#EEA987","#E58C68","#DB7050","#C85A3E","#AC482F","#8F3A26","#73301F","#571F14","#3D140D"];
+const DOMAIN_TEXT = ["#4A2E7A","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC"];
 function domainMatchIndex(domainStr){
   const first = String(domainStr||"").split(",")[0].trim();
   return DOMAIN_ORDER.findIndex(d => first.includes(d));
@@ -653,6 +654,7 @@ function renderDetail(ex){
     ["キューイング", ex.cueing],
     ["よくあるエラーパターン", ex.error_patterns],
     ["確認事項", ex.confirmation],
+    ["エビデンス", ex.evidence],
   ].filter(([_, v]) => v);
 
   const branchTabs = [
@@ -674,12 +676,18 @@ function renderDetail(ex){
         ${ex.difficulty ? `<span class="tag-chip tag-difficulty">${difficultyStars(ex.difficulty)}</span>` : ""}
         ${tags.map(t => `<span class="tag-chip tag-effect">${escapeHtml(t)}</span>`).join("")}
       </div>
+      ${ex.reps_sets ? `<div style="margin-top:10px;font-size:13px;color:var(--moss);font-weight:700;">📋 推奨：${escapeHtml(ex.reps_sets)}</div>` : ""}
     </div>
 
     ${ex.contraindications ? `
       <div class="warn-box">
         <div class="label">禁忌</div>
         ${escapeHtml(ex.contraindications)}
+      </div>` : ""}
+    ${ex.contraindication_matrix ? `
+      <div class="warn-box" style="background:#fff;border-left-color:var(--gold);color:var(--ink);">
+        <div class="label" style="color:var(--gold);">禁忌チェック表</div>
+        ${escapeHtml(ex.contraindication_matrix)}
       </div>` : ""}
     ${ex.precautions ? `
       <div class="warn-box">
