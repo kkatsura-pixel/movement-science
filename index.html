@@ -45,14 +45,15 @@
     position:sticky;top:0;background:var(--brand-main);z-index:20;
   }
   header.top .header-logo{
-    position:absolute;top:16px;right:20px;height:32px;width:auto;
+    position:absolute;top:20px;right:20px;width:44px;height:auto;
   }
   header.top .eyebrow{
     font-family:"Poppins",var(--sans);font-size:13px;letter-spacing:.04em;color:var(--brand-second);text-transform:none;font-weight:500;opacity:.85;
+    max-width:78%;
   }
   header.top h1{
     font-family:"Archivo Black",var(--sans);
-    font-size:24px;margin:8px 0 0;font-weight:400;letter-spacing:.02em;text-transform:uppercase;color:var(--brand-second);
+    font-size:20px;margin:8px 60px 0 0;font-weight:400;letter-spacing:.02em;text-transform:uppercase;color:var(--brand-second);
   }
 
   /* Screens */
@@ -218,10 +219,10 @@
   nav.tabbar{
     position:fixed;bottom:0;left:0;right:0;background:var(--brand-main);
     border-top:1px solid var(--brand-main);display:flex;z-index:30;
-    padding-bottom:env(safe-area-inset-bottom);
+    padding-bottom:min(env(safe-area-inset-bottom), 6px);
   }
   nav.tabbar button{
-    flex:1;background:none;border:none;padding:8px 4px 7px;font-size:11px;
+    flex:1;background:none;border:none;padding:8px 4px 4px;font-size:11px;
     color:rgba(242,240,234,0.55);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--sans);
   }
   nav.tabbar button .ic{font-size:19px;line-height:1;}
@@ -232,6 +233,7 @@
     display:flex;align-items:center;justify-content:center;
   }
   #opening img{max-width:60%;max-height:40%;opacity:0;transition:opacity .3s ease;}
+  #openingImg1{max-width:90%;max-height:60%;}
   #opening img.show{opacity:1;}
   #opening.fade-out{opacity:0;transition:opacity .4s ease;pointer-events:none;}
 </style>
