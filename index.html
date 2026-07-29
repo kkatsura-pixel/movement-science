@@ -18,6 +18,8 @@
     --clay:#a8503a;
     --clay-dim:#e7d3cb;
     --gold:#b08d3f;
+    --brand-main:#1E3713;
+    --brand-second:#F2F0EA;
     --radius:12px;
     --serif: "Noto Serif JP", Georgia, "Hiragino Mincho ProN", "Yu Mincho", serif;
     --serif-en: "Cormorant Garamond", Georgia, serif;
@@ -26,7 +28,7 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--paper);
+    background:var(--brand-second);
     color:var(--ink);
     font-family:var(--sans);
     -webkit-font-smoothing:antialiased;
@@ -39,15 +41,15 @@
   /* Header */
   header.top{
     padding:34px 20px 22px;
-    border-bottom:1px solid var(--line);
-    position:sticky;top:0;background:var(--paper);z-index:20;
+    border-bottom:1px solid var(--brand-main);
+    position:sticky;top:0;background:var(--brand-main);z-index:20;
   }
   header.top .eyebrow{
-    font-family:var(--serif-en);font-size:13px;letter-spacing:.22em;color:var(--moss);text-transform:uppercase;font-weight:600;
+    font-family:var(--serif-en);font-size:13px;letter-spacing:.22em;color:var(--brand-second);text-transform:uppercase;font-weight:600;opacity:.85;
   }
   header.top h1{
     font-family:var(--serif-en);
-    font-size:26px;margin:8px 0 0;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    font-size:26px;margin:8px 0 0;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-second);
   }
 
   /* Screens */
@@ -211,16 +213,16 @@
 
   /* Tab bar */
   nav.tabbar{
-    position:fixed;bottom:0;left:0;right:0;background:var(--paper);
-    border-top:1px solid var(--line);display:flex;z-index:30;
+    position:fixed;bottom:0;left:0;right:0;background:var(--brand-main);
+    border-top:1px solid var(--brand-main);display:flex;z-index:30;
     padding-bottom:env(safe-area-inset-bottom);
   }
   nav.tabbar button{
     flex:1;background:none;border:none;padding:11px 4px 9px;font-size:11px;
-    color:#9a9587;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--sans);
+    color:rgba(242,240,234,0.55);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--sans);
   }
   nav.tabbar button .ic{font-size:19px;line-height:1;}
-  nav.tabbar button.active{color:var(--moss);font-weight:700;}
+  nav.tabbar button.active{color:var(--brand-second);font-weight:700;}
 </style>
 </head>
 <body>
