@@ -26,7 +26,7 @@
     --sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0;padding:0;overflow-x:hidden;}
   body{
     background:var(--brand-second);
     color:var(--ink);
@@ -35,6 +35,7 @@
     padding-bottom:74px;
     min-height:100vh;
     letter-spacing:.01em;
+    width:100%;
   }
   #app{max-width:640px;margin:0 auto;}
 
@@ -45,7 +46,7 @@
     position:sticky;top:0;background:var(--brand-main);z-index:20;
   }
   header.top .header-logo{
-    position:absolute;top:-1px;right:-16px;width:100px;height:auto;
+    position:absolute;top:4px;right:4px;width:100px;height:auto;
   }
   header.top .eyebrow{
     font-family:"Poppins",var(--sans);font-size:13px;letter-spacing:.04em;color:var(--brand-second);text-transform:none;font-weight:500;opacity:.85;
@@ -234,7 +235,7 @@
     display:flex;align-items:center;justify-content:center;
   }
   #opening img{max-width:60%;max-height:40%;opacity:0;transition:opacity .3s ease;}
-  #openingImg1{width:130vw;height:auto;max-width:none;}
+  #openingImg1{width:300vw;height:auto;max-width:none;}
   #opening img.show{opacity:1;}
   #opening.fade-out{opacity:0;transition:opacity .4s ease;pointer-events:none;}
 </style>
