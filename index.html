@@ -40,9 +40,12 @@
 
   /* Header */
   header.top{
-    padding:34px 20px 22px;
+    padding:26px 20px 16px;
     border-bottom:1px solid var(--brand-main);
     position:sticky;top:0;background:var(--brand-main);z-index:20;
+  }
+  header.top .header-logo{
+    position:absolute;top:16px;right:20px;height:32px;width:auto;
   }
   header.top .eyebrow{
     font-family:"Poppins",var(--sans);font-size:13px;letter-spacing:.04em;color:var(--brand-second);text-transform:none;font-weight:500;opacity:.85;
@@ -218,17 +221,30 @@
     padding-bottom:env(safe-area-inset-bottom);
   }
   nav.tabbar button{
-    flex:1;background:none;border:none;padding:11px 4px 9px;font-size:11px;
+    flex:1;background:none;border:none;padding:8px 4px 7px;font-size:11px;
     color:rgba(242,240,234,0.55);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--sans);
   }
   nav.tabbar button .ic{font-size:19px;line-height:1;}
   nav.tabbar button.active{color:var(--brand-second);font-weight:700;}
+  /* Opening */
+  #opening{
+    position:fixed;inset:0;background:var(--brand-second);z-index:100;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #opening img{max-width:60%;max-height:40%;opacity:0;transition:opacity .3s ease;}
+  #opening img.show{opacity:1;}
+  #opening.fade-out{opacity:0;transition:opacity .4s ease;pointer-events:none;}
 </style>
 </head>
 <body>
+<div id="opening">
+  <img id="openingImg1" src="Kinetica2.png" alt="">
+  <img id="openingImg2" src="Kinetica.png" alt="" style="display:none;">
+</div>
 <div id="app">
 
   <header class="top">
+    <img src="Kinetica3.png" alt="Kinetica" class="header-logo">
     <div class="eyebrow">Integrated Movement Science Platform</div>
     <h1 id="headerTitle">Exercise Library</h1>
   </header>
@@ -1033,6 +1049,22 @@ async function init(){
     document.getElementById(id).addEventListener("input", renderList);
   });
 }
+function runOpening(){
+  const img1 = document.getElementById("openingImg1");
+  const img2 = document.getElementById("openingImg2");
+  const opening = document.getElementById("opening");
+  requestAnimationFrame(() => img1.classList.add("show"));
+  setTimeout(() => {
+    img1.style.display = "none";
+    img2.style.display = "block";
+    requestAnimationFrame(() => img2.classList.add("show"));
+  }, 1500);
+  setTimeout(() => {
+    opening.classList.add("fade-out");
+    setTimeout(() => opening.remove(), 400);
+  }, 3000);
+}
+runOpening();
 init();
 </script>
 </body>
