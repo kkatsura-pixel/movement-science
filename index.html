@@ -17,7 +17,7 @@
     --moss-dim:#8a9a7c;
     --clay:#a8503a;
     --clay-dim:#e7d3cb;
-    --gold:#b08d3f;
+    --gold:#C9A24B;
     --brand-main:#1E3713;
     --brand-second:#F2F0EA;
     --radius:12px;
@@ -97,7 +97,7 @@
   .ex-card{
     background:#fff;border:1px solid var(--line);border-radius:14px;
     padding:16px 17px;display:flex;justify-content:space-between;align-items:center;gap:10px;
-    cursor:pointer;
+    cursor:pointer;box-shadow:0 1px 3px rgba(30,55,19,0.06);
   }
   .ex-card:active{background:var(--paper-dim);}
   .ex-card .name-ja{font-family:var(--serif);font-size:16.5px;font-weight:600;letter-spacing:.01em;}
@@ -126,11 +126,12 @@
   .tag-chip.tag-layer{background:#e2e9f0;color:#3d5a80;}
   .tag-chip.tag-domain{background:#f1e6d0;color:#8a6d1f;}
   .tag-chip.tag-difficulty{background:#FAEEDA;color:#854F0B;font-weight:600;}
-  .tag-chip.tag-effect{background:#DCEBD5;color:#3D6B2C;font-weight:600;}
+  .tag-chip.tag-effect{background:#CBE4BE;color:#2E5A20;font-weight:600;}
 
   .warn-box{
-    margin-top:20px;background:var(--clay-dim);border-left:3px solid var(--clay);
-    border-radius:0 10px 10px 0;padding:16px 18px;font-size:13.5px;line-height:1.7;color:#6b2f1f;
+    margin-top:20px;background:var(--clay-dim);border-left:4px solid var(--clay);
+    border-radius:0 12px 12px 0;padding:16px 18px;font-size:13.5px;line-height:1.7;color:#6b2f1f;
+    box-shadow:0 1px 3px rgba(30,55,19,0.05);
   }
   .warn-box .label{font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;color:var(--clay);}
 
@@ -143,7 +144,7 @@
 
   .branch-tabs{display:flex;gap:8px;margin-top:12px;}
   .branch-tab{
-    flex:1;text-align:center;font-size:12px;padding:8px 4px;border-radius:8px;
+    flex:1;text-align:center;font-size:12px;padding:8px 4px;border-radius:10px;
     background:var(--paper-dim);color:#5c574c;cursor:pointer;border:1px solid transparent;
   }
   .branch-tab.active{background:var(--ink);color:var(--paper);}
@@ -157,8 +158,9 @@
   .branch-panel.active{display:block;}
   .chip-list{display:flex;flex-direction:column;gap:10px;}
   .chip-link{
-    background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px;
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;
     font-size:13.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+    box-shadow:0 1px 3px rgba(30,55,19,0.05);
   }
   .chip-link:active{background:var(--paper-dim);}
   .chip-link .arrow{color:var(--moss);}
@@ -166,8 +168,9 @@
   .chip-link.related .arrow{color:var(--moss);font-size:18px;}
 
   .branch-card{
-    background:#fff;border:1px solid var(--line);border-radius:10px;
+    background:#fff;border:1px solid var(--line);border-radius:12px;
     padding:13px 15px;font-size:13.5px;line-height:1.75;color:#33362f;margin-bottom:10px;
+    box-shadow:0 1px 3px rgba(30,55,19,0.05);
   }
   .branch-link{color:var(--moss);font-weight:700;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:2px;}
   .branch-label{font-weight:700;color:var(--ink);display:block;margin-bottom:6px;font-family:var(--serif);font-size:15.5px;border-bottom:1px solid var(--line);padding-bottom:5px;}
