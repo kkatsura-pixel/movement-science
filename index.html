@@ -167,6 +167,18 @@
   .chip-link.related{background:#EEF2E9;border-color:var(--moss-dim);font-weight:600;}
   .chip-link.related .arrow{color:var(--moss);font-size:18px;}
 
+  .video-link{
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+    font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:10px;
+    box-shadow:0 1px 3px rgba(30,55,19,0.06);text-decoration:none;color:var(--ink);
+  }
+  .video-link .play-ic{
+    width:26px;height:26px;border-radius:50%;background:var(--moss);display:flex;
+    align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .video-link span.vlabel{flex:1;}
+  .video-link .arrow{color:var(--moss);font-size:16px;}
+
   .branch-card{
     background:#fff;border:1px solid var(--line);border-radius:12px;
     padding:13px 15px;font-size:13.5px;line-height:1.75;color:#33362f;margin-bottom:10px;
@@ -669,18 +681,46 @@ function renderDetail(ex){
 
   document.getElementById("tab-detail").style.display = "flex";
 
-  const sections = [
+  const sectionsBeforeVideo = [
     ["概要", ex.overview],
     ["主訴・適応症状", ex.indications],
     ["解剖学", ex.anatomy],
     ["機能解剖学", ex.functional_anatomy],
     ["神経科学的視点", ex.neuroscience],
+  ].filter(([_, v]) => v);
+  const sectionsAfterVideo = [
     ["手順", ex.steps],
     ["キューイング", ex.cueing],
     ["よくあるエラーパターン", ex.error_patterns],
     ["確認事項", ex.confirmation],
     ["エビデンス＋リファレンス", ex.evidence],
   ].filter(([_, v]) => v);
+  const renderSection = ([label, body]) => `
+      <div class="section">
+        <div class="label">${label}</div>
+        <div class="body">${escapeHtml(body)}</div>
+      </div>
+    `;
+  const videoName = ex.name_ja || ex.name_custom || "";
+  const videoNameEn = ex.name_en || "";
+  const videoSection = videoName ? `
+    <div class="section">
+      <div class="label">エクササイズ動画</div>
+      <div style="font-size:11px;color:#767267;margin:-4px 0 12px;">※検索結果がゼロの場合もあります</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <a class="video-link" href="https://www.google.com/search?tbm=vid&q=${encodeURIComponent(videoName)}" target="_blank" rel="noopener">
+          <span class="play-ic"><svg viewBox="0 0 24 24" width="11" height="11" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="vlabel">動画を見る（日本語）</span>
+          <span class="arrow">›</span>
+        </a>
+        ${videoNameEn ? `
+        <a class="video-link" href="https://www.google.com/search?tbm=vid&q=${encodeURIComponent(videoNameEn)}" target="_blank" rel="noopener">
+          <span class="play-ic"><svg viewBox="0 0 24 24" width="11" height="11" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="vlabel">動画を見る（英語）</span>
+          <span class="arrow">›</span>
+        </a>` : ""}
+      </div>
+    </div>` : "";
 
   const branchTabs = [
     {key:"progressions", label:"プログレッション", data: progressions},
@@ -716,12 +756,9 @@ function renderDetail(ex){
         ${escapeHtml(ex.precautions)}
       </div>` : ""}
 
-    ${sections.map(([label, body]) => `
-      <div class="section">
-        <div class="label">${label}</div>
-        <div class="body">${escapeHtml(body)}</div>
-      </div>
-    `).join("")}
+    ${sectionsBeforeVideo.map(renderSection).join("")}
+    ${videoSection}
+    ${sectionsAfterVideo.map(renderSection).join("")}
 
     ${(before.length || after.length) ? `
       <div class="section">
