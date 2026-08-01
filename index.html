@@ -785,8 +785,8 @@ function renderDetail(ex){
       <div class="section">
         <div class="label">流れ</div>
         <div class="body">
-          ${before.length ? `<strong>前段：</strong>${before.map(escapeHtml).join(" / ")}<br>` : ""}
-          ${after.length ? `<strong>後段：</strong>${after.map(escapeHtml).join(" / ")}` : ""}
+          ${before.length ? `<strong>前段：</strong>${before.map(n => linkifyExerciseNames(n)).join(" / ")}<br>` : ""}
+          ${after.length ? `<strong>後段：</strong>${after.map(n => linkifyExerciseNames(n)).join(" / ")}` : ""}
         </div>
       </div>` : ""}
 
