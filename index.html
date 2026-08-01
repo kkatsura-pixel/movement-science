@@ -709,20 +709,33 @@ function renderDetail(ex){
         <div class="body">${escapeHtml(body)}</div>
       </div>
     `;
+
+  // 検索ヒット率を上げるためのカテゴリ補助キーワード（領域＝Layer 0-6 に対応）
+  const VIDEO_KEYWORD_JA = {
+    "Layer 0": "発達運動学 エクササイズ", "Layer 1": "神経系 エクササイズ", "Layer 2": "呼吸 エクササイズ",
+    "Layer 3": "ピラティス", "Layer 4": "機能訓練 エクササイズ", "Layer 5": "筋トレ", "Layer 6": "スポーツ トレーニング"
+  };
+  const VIDEO_KEYWORD_EN = {
+    "Layer 0": "developmental exercise", "Layer 1": "neuromuscular drill", "Layer 2": "breathing exercise",
+    "Layer 3": "pilates", "Layer 4": "functional training", "Layer 5": "strength training", "Layer 6": "sports training"
+  };
+  const primaryLayer = splitMultiValue(ex.layer)[0] || "";
   const videoName = ex.name_ja || ex.name_custom || "";
   const videoNameEn = ex.name_en || "";
+  const videoQueryJa = videoName ? `${videoName} ${VIDEO_KEYWORD_JA[primaryLayer] || "エクササイズ"}` : "";
+  const videoQueryEn = videoNameEn ? `${videoNameEn} ${VIDEO_KEYWORD_EN[primaryLayer] || "exercise"}` : "";
   const videoSection = videoName ? `
     <div class="section">
       <div class="label">エクササイズ動画</div>
       <div style="font-size:11px;color:#767267;margin:-4px 0 12px;">※検索結果が該当なし/異なる場合もあります</div>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <a class="video-link" href="https://www.google.com/search?tbm=vid&q=${encodeURIComponent(videoName)}" target="_blank" rel="noopener">
+        <a class="video-link" href="https://www.google.com/search?tbm=vid&q=${encodeURIComponent(videoQueryJa)}" target="_blank" rel="noopener">
           <span class="play-ic"><svg viewBox="0 0 24 24" width="11" height="11" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
           <span class="vlabel">動画を見る（日本語）</span>
           <span class="arrow">›</span>
         </a>
         ${videoNameEn ? `
-        <a class="video-link" href="https://www.google.com/search?tbm=vid&q=${encodeURIComponent(videoNameEn)}" target="_blank" rel="noopener">
+        <a class="video-link" href="https://www.google.com/search?tbm=vid&q=${encodeURIComponent(videoQueryEn)}" target="_blank" rel="noopener">
           <span class="play-ic"><svg viewBox="0 0 24 24" width="11" height="11" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
           <span class="vlabel">動画を見る（英語）</span>
           <span class="arrow">›</span>
@@ -1005,7 +1018,7 @@ ${candidateList}
 出力形式：
 1. まず、目的に応じた推奨スクリーニング・評価を2〜3個、「◆評価名」の形式で明記してください。上記の登録済みスクリーニング候補の中に、目的に合致するものがあれば、その名称をそのまま使用してください（他の名称に言い換えないでください）。合致するものがない場合のみ、①何を評価するためのものか②その結果から何がわかるかを1〜2文で添える形で、一般的な運動学・評価学の用語を使い自由に提案してください。特定の団体・企業の固有名称やブランド名は使用しないでください。
 2. 次に、エクササイズ候補リストの中から${itemCount}種目を選び「・種目名」の形式で明記し、選定理由を1〜2文で添えてください。年齢が指定されている場合は年代に応じた負荷・注意点も考慮してください。エクササイズ候補リストにスクリーニング系種目は含まれていないため、種目としては提案しないでください。
-3. 最後に、実施順序と全体の狙いを、なぜこの組み合わせ・順序が目的の達成に有効なのか、関連する生理学的・運動学的な理由を含めて詳しく説明してください。単なる手順の要約ではなく、種目間のつながり（例：前段の種目がどう後段の種目の土台になるか）にも触れてください。`;
+3. 最後に、実施順序と全体の狙いを、なぜこの組み合わせ・順序が目的の達成に有効なのか、関連する生理学的・運動学的な理由を含めて詳しく説明してください。単なる手順の要約ではなく、種目間のつながり（例：前段の種目がどう後段の種目の土台になるか）だけでなく、1で提案した評価・スクリーニングが、この一連のプログラム全体の中でどのような役割を果たすか（例：評価結果に応じてどう種目選択・強度調整に活かすか、評価と種目群がどう連動しているか）にも必ず触れてください。`;
 
   try{
     const res = await fetch(`${WORKER_URL}?target=gemini`, {
