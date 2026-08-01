@@ -457,12 +457,20 @@ function splitMultiValue(str){
 function uniqueSplitValues(list, key){
   const set = new Set();
   list.forEach(x => splitMultiValue(x[key]).forEach(v => set.add(v)));
-  return [...set].sort();
+  return [...set];
+}
+
+const LAYER_ORDER = ["Layer 0","Layer 1","Layer 2","Layer 3","Layer 4","Layer 5","Layer 6"];
+function sortByFixedOrder(values, orderArr){
+  return [...values].sort((a, b) => {
+    const ia = orderArr.indexOf(a), ib = orderArr.indexOf(b);
+    return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+  });
 }
 
 function populateFilters(){
-  const layers = uniqueSplitValues(allExercises, "layer");
-  const domains = uniqueSplitValues(allExercises, "domain");
+  const layers = sortByFixedOrder(uniqueSplitValues(allExercises, "layer"), LAYER_ORDER);
+  const domains = sortByFixedOrder(uniqueSplitValues(allExercises, "domain"), DOMAIN_ORDER);
   const difficulties = uniqueValues(allExercises, "difficulty");
 
   fillSelect("f-layer", layers, "領域：すべて", false, layerLabel);
@@ -955,10 +963,17 @@ async function generateProgram(){
   const durationToCount = { "10": 3, "20": 5, "30": 6, "45": 8, "60": 10 };
   const itemCount = durationToCount[duration] || 5;
 
-  // 候補種目リストを簡潔な形でプロンプトに渡す
+  // 候補種目リスト（スクリーニング系は除外し、一般エクササイズのみ）
   const candidateList = allExercises
+    .filter(ex => !splitMultiValue(ex.domain).includes("スクリーニング系"))
     .filter(ex => (!domain || splitMultiValue(ex.domain).includes(domain)))
     .map(ex => `・${ex.name_ja}｜領域:${ex.layer||"-"}｜レイヤー:${ex.domain||"-"}｜難易度:${ex.difficulty||"-"}`)
+    .join("\n");
+
+  // 登録済みスクリーニング系種目（評価の優先候補）
+  const screeningList = allExercises
+    .filter(ex => splitMultiValue(ex.domain).includes("スクリーニング系"))
+    .map(ex => `・${ex.name_ja}｜対象：${ex.indications||"-"}`)
     .join("\n");
 
   const prompt = `あなたは運動科学と身体教育の専門家です。以下の条件に基づき、まず推奨されるスクリーニング・評価を提示し、次に下記の候補リストの中から${itemCount}種目を選び、選定理由と実施順序を日本語で提案してください。候補リストにない種目は提案しないでください。
@@ -981,12 +996,15 @@ ${domain || "指定なし"}
 【所要時間】
 ${duration ? duration + "分" : "指定なし"}
 
-【候補リスト】
+【登録済みスクリーニング候補（評価の提案時、内容が合致するものがあれば必ずこの名称をそのまま使用してください）】
+${screeningList || "（登録なし）"}
+
+【エクササイズ候補リスト】
 ${candidateList}
 
 出力形式：
-1. まず、目的に応じた推奨スクリーニング・評価を2〜3個、「◆評価名」の形式で明記し、①何を評価するためのものか②その結果から何がわかるかを1〜2文で添えてください。可動域テスト・姿勢観察・動作観察・呼吸パターン評価など、一般的な運動学・評価学の用語で表現し、特定の団体・企業の固有名称やブランド名は使用しないでください。
-2. 次に、候補リストの中から${itemCount}種目を選び「・種目名」の形式で明記し、選定理由を1〜2文で添えてください。年齢が指定されている場合は年代に応じた負荷・注意点も考慮してください。
+1. まず、目的に応じた推奨スクリーニング・評価を2〜3個、「◆評価名」の形式で明記してください。上記の登録済みスクリーニング候補の中に、目的に合致するものがあれば、その名称をそのまま使用してください（他の名称に言い換えないでください）。合致するものがない場合のみ、①何を評価するためのものか②その結果から何がわかるかを1〜2文で添える形で、一般的な運動学・評価学の用語を使い自由に提案してください。特定の団体・企業の固有名称やブランド名は使用しないでください。
+2. 次に、エクササイズ候補リストの中から${itemCount}種目を選び「・種目名」の形式で明記し、選定理由を1〜2文で添えてください。年齢が指定されている場合は年代に応じた負荷・注意点も考慮してください。エクササイズ候補リストにスクリーニング系種目は含まれていないため、種目としては提案しないでください。
 3. 最後に、実施順序と全体の狙いを、なぜこの組み合わせ・順序が目的の達成に有効なのか、関連する生理学的・運動学的な理由を含めて詳しく説明してください。単なる手順の要約ではなく、種目間のつながり（例：前段の種目がどう後段の種目の土台になるか）にも触れてください。`;
 
   try{
@@ -1018,8 +1036,13 @@ ${candidateList}
       if(/^◆/.test(p)){
         if(!inTimeline){ html += `<div class="gen-timeline">`; inTimeline = true; }
         evalIndex++;
-        const body = boldify(p.replace(/^◆\s*/, ""), "gen-eval-name");
-        html += `<div class="gen-tl-item eval"><div class="gen-tl-badge eval">評</div><div class="gen-tl-body">${body}</div></div>`;
+        const rawEvalText = p.replace(/^◆\s*/, "");
+        const matchedScreening = allExercises.find(e =>
+          splitMultiValue(e.domain).includes("スクリーニング系") && rawEvalText.includes(e.name_ja)
+        );
+        const body = boldify(rawEvalText, "gen-eval-name");
+        const clickAttr = matchedScreening ? ` onclick="openDetailByName('${escapeAttr(matchedScreening.name_ja)}')" style="cursor:pointer;"` : "";
+        html += `<div class="gen-tl-item eval"${clickAttr}><div class="gen-tl-badge eval">評</div><div class="gen-tl-body">${body}</div></div>`;
         return;
       }
       if(/^・/.test(p)){
