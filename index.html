@@ -568,9 +568,8 @@ function renderList(){
     return `
     <div class="ex-card" onclick="openDetailByName('${escapeAttr(ex.name_ja)}')">
       <div>
-        <div class="name-ja" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <span>${escapeHtml(ex.name_ja || ex.name_custom || "(名称未設定)")}</span>
-          ${ex.difficulty ? `<span class="badge diff" style="font-size:9px;">${difficultyStars(ex.difficulty)}</span>` : ""}
+        <div class="name-ja">
+          ${escapeHtml(ex.name_ja || ex.name_custom || "(名称未設定)")}${ex.difficulty ? `<span class="badge diff" style="font-size:9px;display:inline-block;vertical-align:middle;margin-left:8px;">${difficultyStars(ex.difficulty)}</span>` : ""}
         </div>
         ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
         <div class="meta" style="margin-top:6px;">
