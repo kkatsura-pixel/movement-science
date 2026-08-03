@@ -947,6 +947,11 @@ function switchTab(name, fromCardClick){
 }
 
 function goToFilteredList(selectId, value){
+  // ガイドからの遷移では、領域・レイヤーのうちタップされていない方を必ず「すべて」にリセットする
+  ["f-layer", "f-domain"].forEach(id => {
+    const other = document.getElementById(id);
+    if(other && id !== selectId) other.value = "";
+  });
   const el = document.getElementById(selectId);
   if(el) el.value = value;
   switchTab("list");
