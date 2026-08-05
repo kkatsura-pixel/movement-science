@@ -631,7 +631,7 @@ function layerColorPair(layerStr){
   return LAYER_COLORS[key] || ["#eae6db", "#5c574c"];
 }
 
-const DOMAIN_ORDER = ["スクリーニング系","リリース・準備系","モビリティ系","神経系再教育系","呼吸・姿勢再統合系","発達パターン系","アクティベーション系","コレクティブ系","ピラティス系","ファンクショナル系","ストレングス系","コンディショニング系","パフォーマンス系"];
+const DOMAIN_ORDER = ["スクリーニング系","リリース・準備系","モビリティ系","神経系再教育系","呼吸・姿勢再統合系","発達パターン系","アクティベーション系","コレクティブ系","ピラティス系","ピラティスイクイップメント系","ファンクショナル系","ストレングス系","コンディショニング系","パフォーマンス系"];
 const DOMAIN_CONTENT = [
   "可動域テスト・姿勢観察・動作観察・呼吸パターン評価等、種目選定前に行う評価・スクリーニング",
   "筋膜・筋の緊張緩和、セルフミオファシャルリリース、静的・動的ストレッチ、神経系のダウンレギュレーション",
@@ -641,13 +641,14 @@ const DOMAIN_CONTENT = [
   "原始パターン（仰向け・寝返り）、四つ這いパターン、ハーフニーリングパターン、立位・歩行パターンの再教育",
   "神経筋活性化、モーターコントロール、インナーユニット活性化、臀筋・肩甲帯の個別活性化",
   "代償動作の修正、左右非対称性の修正、疼痛回避パターンの修正",
-  "マット・リフォーマー・キャデラック・チェア・バレルを用いた動作制御トレーニング",
+  "マットワークを中心とした動作制御トレーニング（呼吸・体幹コントロール・分節的な脊柱運動）",
+  "リフォーマー・キャデラック・チェア・バレル等、専用マシン・器具を用いたピラティストレーニング",
   "複合動作の統合、実生活動作（ヒンジ・スクワット等）への応用、動作連鎖トレーニング",
   "自重トレーニング、フリーウェイト、マシントレーニング、基本的な筋力発揮パターン",
   "有酸素トレーニング、インターバルトレーニング、代謝系コンディショニング、リカバリー",
   "競技特異的トレーニング、スプリント、アジリティ、パワー開発、ピーキング"
 ];
-const DOMAIN_COLORS = ["#EDE7F6","#FDF1EC","#FADFCF","#F5C7AE","#EEA987","#E58C68","#DB7050","#C85A3E","#AC482F","#8F3A26","#73301F","#571F14","#3D140D"];
+const DOMAIN_COLORS = ["#EDE7F6","#FDF1EC","#FADFCF","#F5C7AE","#EEA987","#E58C68","#DB7050","#C85A3E","#AC482F","#9D412A","#8F3A26","#73301F","#571F14","#3D140D"];
 const DOMAIN_IMAGES = [
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l1.JPG",
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l2.JPG",
@@ -658,12 +659,13 @@ const DOMAIN_IMAGES = [
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l7.JPG",
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l8.JPG",
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l9.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l14.jpg",
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l10.JPG",
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l11.JPG",
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l12.JPG",
   "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l13.JPG"
 ];
-const DOMAIN_TEXT = ["#4A2E7A","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC"];
+const DOMAIN_TEXT = ["#4A2E7A","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC"];
 function domainMatchIndex(domainStr){
   const first = String(domainStr||"").split(",")[0].trim();
   return DOMAIN_ORDER.findIndex(d => first.includes(d));
