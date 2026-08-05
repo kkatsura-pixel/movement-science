@@ -553,7 +553,8 @@ function renderList(){
   if(domainVal){
     const idx = domainMatchIndex(domainVal);
     if(idx !== -1){
-      infoHtml += `<div class="filter-info"><div class="fi-label">レイヤー</div><div class="fi-title">${escapeHtml(domainVal)}</div><div class="fi-content">内容：${escapeHtml(DOMAIN_CONTENT[idx])}</div></div>`;
+      const domainImg = DOMAIN_IMAGES[idx] ? `<img src="${escapeHtml(DOMAIN_IMAGES[idx])}" alt="${escapeHtml(domainVal)}" class="fi-image">` : "";
+      infoHtml += `<div class="filter-info"><div class="fi-label">レイヤー</div><div class="fi-title">${escapeHtml(domainVal)}</div><div class="fi-content">内容：${escapeHtml(DOMAIN_CONTENT[idx])}</div>${domainImg}</div>`;
     }
   }
   infoEl.innerHTML = infoHtml;
@@ -647,6 +648,21 @@ const DOMAIN_CONTENT = [
   "競技特異的トレーニング、スプリント、アジリティ、パワー開発、ピーキング"
 ];
 const DOMAIN_COLORS = ["#EDE7F6","#FDF1EC","#FADFCF","#F5C7AE","#EEA987","#E58C68","#DB7050","#C85A3E","#AC482F","#8F3A26","#73301F","#571F14","#3D140D"];
+const DOMAIN_IMAGES = [
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l1.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l2.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l3.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l4.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l5.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l6.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l7.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l8.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l9.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l10.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l11.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l12.JPG",
+  "https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_l13.JPG"
+];
 const DOMAIN_TEXT = ["#4A2E7A","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#3D140D","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC","#FDF1EC"];
 function domainMatchIndex(domainStr){
   const first = String(domainStr||"").split(",")[0].trim();
