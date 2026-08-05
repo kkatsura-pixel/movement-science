@@ -91,6 +91,7 @@
   .filter-info .fi-label{font-size:11px;font-weight:400;color:#767267;letter-spacing:.04em;margin-bottom:3px;}
   .filter-info .fi-title{font-family:var(--serif);font-size:15.5px;font-weight:700;color:#2e3d27;margin-bottom:5px;}
   .filter-info .fi-content{font-size:12.5px;line-height:1.75;color:#465239;}
+  .filter-info .fi-image{width:100%;height:auto;display:block;border-radius:8px;margin-top:12px;}
 
   /* Exercise cards */
   .ex-list{display:flex;flex-direction:column;gap:12px;}
@@ -546,7 +547,8 @@ function renderList(){
   const domainVal = document.getElementById("f-domain").value;
   let infoHtml = "";
   if(layerVal && LAYER_INFO[layerVal]){
-    infoHtml += `<div class="filter-info"><div class="fi-label">領域</div><div class="fi-title">${escapeHtml(LAYER_INFO[layerVal].title)}</div><div class="fi-content">内容：${escapeHtml(LAYER_INFO[layerVal].content)}</div></div>`;
+    const layerImg = LAYER_INFO[layerVal].image ? `<img src="${escapeHtml(LAYER_INFO[layerVal].image)}" alt="${escapeHtml(LAYER_INFO[layerVal].label)}" class="fi-image">` : "";
+    infoHtml += `<div class="filter-info"><div class="fi-label">領域</div><div class="fi-title">${escapeHtml(LAYER_INFO[layerVal].title)}</div><div class="fi-content">内容：${escapeHtml(LAYER_INFO[layerVal].content)}</div>${layerImg}</div>`;
   }
   if(domainVal){
     const idx = domainMatchIndex(domainVal);
@@ -572,7 +574,7 @@ function renderList(){
           ${escapeHtml(ex.name_ja || ex.name_custom || "(名称未設定)")}${ex.difficulty ? `<span class="badge diff" style="font-size:9px;display:inline-block;vertical-align:middle;margin-left:8px;">${difficultyStars(ex.difficulty)}</span>` : ""}
         </div>
         ${ex.name_en ? `<div class="name-en">${escapeHtml(ex.name_en)}</div>` : ""}
-        <div class="meta" style="margin-top:6px;flex-wrap:wrap;row-gap:6px;">
+        <div class="meta" style="margin-top:6px;">
           ${ex.layer ? `<span class="badge" style="background:${lc[0]};color:${lc[1]};border-color:transparent;font-weight:600;">${escapeHtml(layerLabels(ex.layer))}</span>` : ""}
           ${ex.domain ? `<span class="badge" style="background:${dc[0]};color:${dc[1]};border-color:transparent;font-weight:600;">${escapeHtml(String(ex.domain).split(",")[0].trim())}</span>` : ""}
         </div>
@@ -602,7 +604,7 @@ function difficultyStars(val){
 }
 
 const LAYER_INFO = {
-  "Layer 0": {label:"発達運動学", title:"発達運動学（Developmental Kinesiology）", content:"原始反射の統合、正中線交差、対側性協調、寝返り→ハイハイ（四つ這い）→高這い→ハーフニーリング→立位→歩行という発達順序、姿勢の系統発生的基盤"},
+  "Layer 0": {label:"発達運動学", title:"発達運動学（Developmental Kinesiology）", content:"原始反射の統合、正中線交差、対側性協調、寝返り→ハイハイ（四つ這い）→高這い→ハーフニーリング→立位→歩行という発達順序、姿勢の系統発生的基盤", image:"https://raw.githubusercontent.com/kkatsura-pixel/movement-science/main/IMG_2909.jpeg"},
   "Layer 1": {label:"神経科学的基盤", title:"神経科学的基盤（Neuroscience / Sensorimotor Science）", content:"機能神経学、感覚運動科学、前庭系（耳石器・半規管）、固有受容感覚、視覚系・眼球運動、小脳機能、神経可塑性、疼痛科学（中枢性感作・恐怖回避行動）、自律神経系の調整"},
   "Layer 2": {label:"呼吸・姿勢制御学", title:"呼吸・姿勢制御学（Respiratory & Postural Control）", content:"横隔膜機能、腹腔内圧、インナーユニット（横隔膜・骨盤底筋・腹横筋・多裂筋）、胸郭の位置と可動性、呼吸パターン異常、自律神経（呼吸を介した副交感神経調整）"},
   "Layer 3": {label:"運動制御学", title:"運動制御学（Motor Control）", content:"ピラティス全般（マット・リフォーマー・キャデラック・チェア・バレル）、脊柱の分節的制御、肩甲帯の安定性、運動学習理論、代償動作パターンの修正"},
