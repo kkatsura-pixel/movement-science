@@ -282,6 +282,9 @@
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#5c574c;margin-bottom:10px;">
       <input type="checkbox" id="f-fav-only" style="width:auto;margin:0;"> お気に入りのみ表示
     </label>
+    <div onclick="resetToTopCategoryGrid()" style="display:flex;align-items:center;gap:5px;color:#5b6e4f;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;">
+      <span style="font-size:15px;">←</span> カテゴリ一覧へ戻る
+    </div>
     <div id="filterInfo" style="margin-top:14px;"></div>
     <div class="count-row" id="listCount"></div>
     <div class="ex-list" id="exList"></div>
@@ -544,6 +547,16 @@ function applyFilters(){
   });
 }
 
+function resetToTopCategoryGrid(){
+  ["f-layer","f-domain","f-difficulty","f-tags","f-purpose","f-search"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = "";
+  });
+  const fav = document.getElementById("f-fav-only");
+  if(fav) fav.checked = false;
+  renderList();
+}
+
 function renderTopCategoryGrid(){
   const layerKeys = ["Layer 0","Layer 1","Layer 2","Layer 3","Layer 4","Layer 5","Layer 6"];
   const layerCards = layerKeys.filter(k => LAYER_INFO[k]).map(k => ({
@@ -556,7 +569,7 @@ function renderTopCategoryGrid(){
   return `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       ${cards.map(c => `
-        <div onclick="goToFilteredList('${c.selectId}','${escapeAttr(c.value)}')" style="cursor:pointer;background:#1E3713;border-radius:12px;overflow:hidden;">
+        <div onclick="goToFilteredList('${c.selectId}','${escapeAttr(c.value)}')" style="cursor:pointer;background:#5b6e4f;border-radius:12px;overflow:hidden;">
           ${c.image ? `<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title)}" style="width:100%;height:90px;object-fit:cover;display:block;">` : `<div style="width:100%;height:90px;background:#2a4a1c;"></div>`}
           <div style="padding:10px 12px;">
             <div style="font-size:9.5px;color:#a8b89c;letter-spacing:.04em;margin-bottom:2px;">${c.label}</div>
