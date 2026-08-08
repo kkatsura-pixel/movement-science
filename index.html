@@ -603,6 +603,11 @@ function escapeHtml(str){
 function escapeAttr(str){
   return String(str||"").replace(/'/g, "\\'");
 }
+function insertBreaksBefore(text, regex){
+  if(!text) return "";
+  const parts = String(text).split(regex).map(p => p.trim()).filter(Boolean);
+  return parts.join("\n\n");
+}
 
 const STAR_SVG = '<svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;margin-right:1px;"><path fill="currentColor" d="M12 2.5l2.9 6.3 6.9.7-5.2 4.7 1.5 6.8L12 17.6 5.9 21l1.5-6.8L2.2 9.5l6.9-.7z"/></svg>';
 
@@ -732,9 +737,9 @@ function renderDetail(ex){
     ["神経科学的視点", ex.neuroscience ? escapeHtml(ex.neuroscience) : ""],
   ].filter(([_, v]) => v);
   const foldGroup2 = [
-    ["手順", ex.steps ? escapeHtml(ex.steps) : ""],
-    ["キューイング", ex.cueing ? escapeHtml(ex.cueing) : ""],
-    ["よくあるエラーパターン", ex.error_patterns ? escapeHtml(ex.error_patterns) : ""],
+    ["手順", ex.steps ? escapeHtml(insertBreaksBefore(ex.steps, /(?=\d+\.)/)) : ""],
+    ["キューイング", ex.cueing ? escapeHtml(insertBreaksBefore(ex.cueing, /(?=【)/)) : ""],
+    ["よくあるエラーパターン", ex.error_patterns ? escapeHtml(insertBreaksBefore(ex.error_patterns, /(?=[①②③④⑤⑥⑦⑧⑨⑩])/)) : ""],
     ["注意事項", ex.precautions ? escapeHtml(ex.precautions) : ""],
     ["確認事項", ex.confirmation ? escapeHtml(ex.confirmation) : ""],
     ["エビデンス＋リファレンス", ex.evidence ? escapeHtml(ex.evidence) : ""],
