@@ -419,9 +419,9 @@ function getFavorites(){
 function isFavorite(name){
   return getFavorites().includes(name);
 }
-function toggleDetailFold(){
-  const body = document.getElementById("detailFoldBody");
-  const arrow = document.getElementById("detailFoldArrow");
+function toggleDetailFold(idx){
+  const body = document.getElementById("foldBody-" + idx);
+  const arrow = document.getElementById("foldArrow-" + idx);
   if(!body || !arrow) return;
   const isOpen = body.style.display !== "none";
   body.style.display = isOpen ? "none" : "block";
@@ -716,28 +716,50 @@ function renderDetail(ex){
 
   document.getElementById("tab-detail").style.display = "flex";
 
+  const contraindicationsBody = (ex.contraindications || ex.contraindication_matrix) ? `
+      ${ex.contraindications ? escapeHtml(ex.contraindications) : ""}
+      ${ex.contraindication_matrix ? `<div style="margin-top:${ex.contraindications ? "10px" : "0"};padding-top:${ex.contraindications ? "10px" : "0"};${ex.contraindications ? "border-top:1px solid rgba(0,0,0,0.08);" : ""}">${escapeHtml(ex.contraindication_matrix)}</div>` : ""}
+    ` : "";
+
   const alwaysTop = [
     ["概要", ex.overview],
     ["主訴・適応症状", ex.indications],
   ].filter(([_, v]) => v);
-  const foldedSections = [
-    ["解剖学", ex.anatomy],
-    ["機能解剖学", ex.functional_anatomy],
-    ["神経科学的視点", ex.neuroscience],
-    ["手順", ex.steps],
-    ["キューイング", ex.cueing],
-    ["よくあるエラーパターン", ex.error_patterns],
+  const foldGroup1 = [
+    ["禁忌", contraindicationsBody],
+    ["解剖学", ex.anatomy ? escapeHtml(ex.anatomy) : ""],
+    ["機能解剖学", ex.functional_anatomy ? escapeHtml(ex.functional_anatomy) : ""],
+    ["神経科学的視点", ex.neuroscience ? escapeHtml(ex.neuroscience) : ""],
   ].filter(([_, v]) => v);
-  const alwaysBottom = [
-    ["確認事項", ex.confirmation],
-    ["エビデンス＋リファレンス", ex.evidence],
+  const foldGroup2 = [
+    ["手順", ex.steps ? escapeHtml(ex.steps) : ""],
+    ["キューイング", ex.cueing ? escapeHtml(ex.cueing) : ""],
+    ["よくあるエラーパターン", ex.error_patterns ? escapeHtml(ex.error_patterns) : ""],
+    ["注意事項", ex.precautions ? escapeHtml(ex.precautions) : ""],
+    ["確認事項", ex.confirmation ? escapeHtml(ex.confirmation) : ""],
+    ["エビデンス＋リファレンス", ex.evidence ? escapeHtml(ex.evidence) : ""],
   ].filter(([_, v]) => v);
+
   const renderSection = ([label, body]) => `
       <div class="section">
         <div class="label">${label}</div>
         <div class="body">${escapeHtml(body)}</div>
       </div>
     `;
+
+  let foldCounter = 0;
+  const renderFoldSection = ([label, bodyHtml]) => {
+    const idx = foldCounter++;
+    return `
+      <div class="section">
+        <div class="label fold-toggle" onclick="toggleDetailFold(${idx})" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+          <span>${label}</span>
+          <span id="foldArrow-${idx}" style="font-size:12px;color:var(--clay);white-space:nowrap;margin-left:8px;">詳しく見る →</span>
+        </div>
+        <div id="foldBody-${idx}" class="body" style="display:none;margin-top:8px;">${bodyHtml}</div>
+      </div>
+    `;
+  };
 
   // 検索ヒット率を上げるためのカテゴリ補助キーワード（領域＝Layer 0-6 に対応）
   const VIDEO_KEYWORD_JA = {
@@ -794,39 +816,9 @@ function renderDetail(ex){
     </div>
 
     ${alwaysTop.map(renderSection).join("")}
-
-    ${(() => {
-      const warnHtml = `
-        ${(ex.contraindications || ex.contraindication_matrix) ? `
-        <div class="warn-box">
-          <div class="label">禁忌</div>
-          ${ex.contraindications ? escapeHtml(ex.contraindications) : ""}
-          ${ex.contraindication_matrix ? `<div style="margin-top:${ex.contraindications ? "10px" : "0"};padding-top:${ex.contraindications ? "10px" : "0"};${ex.contraindications ? "border-top:1px solid rgba(0,0,0,0.08);" : ""}">${escapeHtml(ex.contraindication_matrix)}</div>` : ""}
-        </div>` : ""}
-        ${ex.precautions ? `
-        <div class="warn-box">
-          <div class="label">注意事項</div>
-          ${escapeHtml(ex.precautions)}
-        </div>` : ""}
-      `;
-      const hasFoldContent = (ex.contraindications || ex.contraindication_matrix || ex.precautions || foldedSections.length);
-      if(!hasFoldContent) return "";
-      return `
-        <div class="section fold-section">
-          <div class="label fold-toggle" onclick="toggleDetailFold()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-            <span>禁忌・注意事項・解剖学 〜 エラーパターン</span>
-            <span id="detailFoldArrow" style="font-size:12px;color:var(--clay);white-space:nowrap;margin-left:8px;">詳しく見る →</span>
-          </div>
-          <div id="detailFoldBody" style="display:none;margin-top:12px;">
-            ${warnHtml}
-            ${foldedSections.map(renderSection).join("")}
-          </div>
-        </div>
-      `;
-    })()}
-
+    ${foldGroup1.map(renderFoldSection).join("")}
     ${videoSection}
-    ${alwaysBottom.map(renderSection).join("")}
+    ${foldGroup2.map(renderFoldSection).join("")}
 
     ${(before.length || after.length) ? `
       <div class="section">
