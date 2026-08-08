@@ -277,7 +277,7 @@
       <select id="f-difficulty"><option value="">難易度：すべて</option></select>
     </div>
     <input type="search" id="f-tags" placeholder="効果で検索（例：脊柱可動性改善）">
-    <input type="search" id="f-purpose" placeholder="目的で検索（概要から検索）">
+    <input type="search" id="f-purpose" placeholder="目的で検索（例：ヒップアップ、姿勢改善）">
     <input type="search" id="f-search" placeholder="種目名で検索">
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#5c574c;margin-bottom:10px;">
       <input type="checkbox" id="f-fav-only" style="width:auto;margin:0;"> お気に入りのみ表示
@@ -419,6 +419,14 @@ function getFavorites(){
 function isFavorite(name){
   return getFavorites().includes(name);
 }
+function toggleDetailFold(){
+  const body = document.getElementById("detailFoldBody");
+  const arrow = document.getElementById("detailFoldArrow");
+  if(!body || !arrow) return;
+  const isOpen = body.style.display !== "none";
+  body.style.display = isOpen ? "none" : "block";
+  arrow.textContent = isOpen ? "詳しく見る →" : "閉じる ↑";
+}
 function toggleFavorite(name, event){
   if(event) event.stopPropagation();
   let favs = getFavorites();
@@ -519,7 +527,7 @@ function applyFilters(){
       if(!tagHay.includes(tagSearch)) return false;
     }
     if(purposeSearch){
-      const purposeHay = `${ex.overview||""} ${ex.confirmation||""} ${ex.precautions||""} ${ex.tags||""} ${ex.error_patterns||""} ${ex.indications||""}`.toLowerCase();
+      const purposeHay = `${ex.overview||""} ${ex.confirmation||""} ${ex.precautions||""} ${ex.tags||""} ${ex.error_patterns||""} ${ex.indications||""} ${ex.goal_keywords||""}`.toLowerCase();
       if(!purposeHay.includes(purposeSearch)) return false;
     }
     if(nameSearch){
@@ -708,17 +716,19 @@ function renderDetail(ex){
 
   document.getElementById("tab-detail").style.display = "flex";
 
-  const sectionsBeforeVideo = [
+  const alwaysTop = [
     ["概要", ex.overview],
     ["主訴・適応症状", ex.indications],
+  ].filter(([_, v]) => v);
+  const foldedSections = [
     ["解剖学", ex.anatomy],
     ["機能解剖学", ex.functional_anatomy],
     ["神経科学的視点", ex.neuroscience],
-  ].filter(([_, v]) => v);
-  const sectionsAfterVideo = [
     ["手順", ex.steps],
     ["キューイング", ex.cueing],
     ["よくあるエラーパターン", ex.error_patterns],
+  ].filter(([_, v]) => v);
+  const alwaysBottom = [
     ["確認事項", ex.confirmation],
     ["エビデンス＋リファレンス", ex.evidence],
   ].filter(([_, v]) => v);
@@ -781,24 +791,42 @@ function renderDetail(ex){
         ${ex.difficulty ? `<span class="tag-chip tag-difficulty">${difficultyStars(ex.difficulty)}</span>` : ""}
         ${tags.map(t => `<span class="tag-chip tag-effect">${escapeHtml(t)}</span>`).join("")}
       </div>
-      ${ex.reps_sets ? `<div style="margin-top:10px;font-size:13px;color:var(--moss);font-weight:700;">📋 推奨：${escapeHtml(ex.reps_sets)}</div>` : ""}
     </div>
 
-    ${(ex.contraindications || ex.contraindication_matrix) ? `
-      <div class="warn-box">
-        <div class="label">禁忌</div>
-        ${ex.contraindications ? escapeHtml(ex.contraindications) : ""}
-        ${ex.contraindication_matrix ? `<div style="margin-top:${ex.contraindications ? "10px" : "0"};padding-top:${ex.contraindications ? "10px" : "0"};${ex.contraindications ? "border-top:1px solid rgba(0,0,0,0.08);" : ""}">${escapeHtml(ex.contraindication_matrix)}</div>` : ""}
-      </div>` : ""}
-    ${ex.precautions ? `
-      <div class="warn-box">
-        <div class="label">注意事項</div>
-        ${escapeHtml(ex.precautions)}
-      </div>` : ""}
+    ${alwaysTop.map(renderSection).join("")}
 
-    ${sectionsBeforeVideo.map(renderSection).join("")}
+    ${(() => {
+      const warnHtml = `
+        ${(ex.contraindications || ex.contraindication_matrix) ? `
+        <div class="warn-box">
+          <div class="label">禁忌</div>
+          ${ex.contraindications ? escapeHtml(ex.contraindications) : ""}
+          ${ex.contraindication_matrix ? `<div style="margin-top:${ex.contraindications ? "10px" : "0"};padding-top:${ex.contraindications ? "10px" : "0"};${ex.contraindications ? "border-top:1px solid rgba(0,0,0,0.08);" : ""}">${escapeHtml(ex.contraindication_matrix)}</div>` : ""}
+        </div>` : ""}
+        ${ex.precautions ? `
+        <div class="warn-box">
+          <div class="label">注意事項</div>
+          ${escapeHtml(ex.precautions)}
+        </div>` : ""}
+      `;
+      const hasFoldContent = (ex.contraindications || ex.contraindication_matrix || ex.precautions || foldedSections.length);
+      if(!hasFoldContent) return "";
+      return `
+        <div class="section fold-section">
+          <div class="label fold-toggle" onclick="toggleDetailFold()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+            <span>禁忌・注意事項・解剖学 〜 エラーパターン</span>
+            <span id="detailFoldArrow" style="font-size:12px;color:var(--clay);white-space:nowrap;margin-left:8px;">詳しく見る →</span>
+          </div>
+          <div id="detailFoldBody" style="display:none;margin-top:12px;">
+            ${warnHtml}
+            ${foldedSections.map(renderSection).join("")}
+          </div>
+        </div>
+      `;
+    })()}
+
     ${videoSection}
-    ${sectionsAfterVideo.map(renderSection).join("")}
+    ${alwaysBottom.map(renderSection).join("")}
 
     ${(before.length || after.length) ? `
       <div class="section">
