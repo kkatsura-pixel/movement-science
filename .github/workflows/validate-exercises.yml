@@ -1,0 +1,36 @@
+name: Kinetica 種目データ検証
+ 
+# Claudeの自己申告に依存しない、独立した自動チェック層。
+# このワークフローが失敗した場合、種目データに仕様書違反があることを意味する。
+ 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}  # 手動実行も可能
+ 
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+ 
+      - name: Pythonをセットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+ 
+      - name: 依存パッケージをインストール
+        run: pip install requests
+ 
+      - name: 種目データを検証（仕様書4節・5節・14-1節の基準）
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: python ci_setup/validate_exercises.py
+ 
+      # 上記ステップが失敗（exit code 1）すると、このワークフロー全体が失敗としてマークされ、
+      # GitHub上に赤い✕が表示される。プルリクエストのマージ前チェックとして使うことで、
+      # 「基準を満たさないデータが本番に混入すること」を機械的に防止する。
