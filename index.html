@@ -6,7 +6,7 @@
 <title>統合運動科学リファレンス</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@500;700&family=Poppins:wght@400;500;600&family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+JP:wght@500;700&family=Poppins:wght@400;500;600&family=Archivo+Black&family=Zen+Kaku+Gothic+New:wght@700&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#1c2521;
@@ -577,7 +577,7 @@ function renderTopCategoryGrid(){
           ${c.image ? `<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title)}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">` : `<div style="position:absolute;inset:0;background:#2a4a1c;"></div>`}
           <div style="position:absolute;left:0;right:0;bottom:0;height:${overlayHeight};background:linear-gradient(to top, rgba(20,28,16,${overlayTop}), rgba(20,28,16,0));"></div>
           <div style="position:relative;padding:10px 12px;color:#F2F0EA;height:100%;display:flex;flex-direction:column;justify-content:flex-end;">
-            <div style="font-family:var(--serif);font-size:14px;font-weight:700;">${escapeHtml(c.title)}</div>
+            <div style="font-family:'Zen Kaku Gothic New',var(--sans);font-size:14px;font-weight:700;letter-spacing:.08em;">${escapeHtml(c.title)}</div>
           </div>
         </div>
       `;}).join("")}
