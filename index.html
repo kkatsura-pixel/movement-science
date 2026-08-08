@@ -571,7 +571,7 @@ function renderTopCategoryGrid(){
       ${cards.map(c => `
         <div onclick="goToFilteredList('${c.selectId}','${escapeAttr(c.value)}')" style="cursor:pointer;position:relative;border-radius:12px;overflow:hidden;height:110px;">
           ${c.image ? `<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title)}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">` : `<div style="position:absolute;inset:0;background:#2a4a1c;"></div>`}
-          <div style="position:absolute;inset:0;background:linear-gradient(160deg, rgba(91,110,79,0.35), rgba(58,70,50,0.75));"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(160deg, rgba(91,110,79,0.35), rgba(48,58,42,0.85));"></div>
           <div style="position:relative;padding:10px 12px;color:#F2F0EA;height:100%;display:flex;flex-direction:column;justify-content:flex-end;">
             <div style="font-size:9px;color:#d6dccd;letter-spacing:.04em;">${c.label}</div>
             <div style="font-family:var(--serif);font-size:13px;font-weight:700;">${escapeHtml(c.title)}</div>
